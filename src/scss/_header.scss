@@ -1,0 +1,74 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    max-width: 1270px;
+    margin: auto;
+}
+
+@media(max-width: 1300px) {
+    .header {
+        margin: 0 8px;
+    }
+}
+
+// LOGO
+.smallContainer {
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 11px;
+    align-items: center;
+}
+
+.logo__title {
+    text-transform: uppercase;
+    color: #fff;
+    @include h3-m
+}
+
+// MAIN MENU
+.menu {
+    margin: 7px 0;
+}
+
+.menu__list {
+    list-style: none;
+    
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 20px;
+}
+
+.menu__link {
+    text-transform: uppercase;
+    @include menu
+}
+
+// BUTTON
+.button {
+    background-color: transparent;
+    border: 1px solid #fff;
+    border-radius: 3px;
+
+    min-width: 115px;
+    min-height: 30px;
+    padding-top: 7px;
+    padding-bottom: 6px;
+
+    @include menu;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+// TELEPHONE
+.tel {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+

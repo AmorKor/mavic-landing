@@ -1,0 +1,10 @@
+.hero.contentContainer__hero   
+    h1.hero__title Mavic 2 Pro
+    img.hero__img(src="img/drone.png", alt="Mavic drone")
+    p.hero__desc.
+        Квадрокоптер Dji Mavic 2 Pro с профессиональной камерой Hasselblad
+    ul.socials
+        for img in ['fb', 'yt', 'ins']
+            li.socials__item
+                a.socials__link(href='#')
+                    img(src=`img/icons/${img}.png`, alt=`${img}`)

@@ -1,0 +1,13 @@
+header.header
+    .logo.smallContainer
+        img.logo__img(src="img/dji_logo_gray 1.png", alt="logo")
+        p.logo__title mavic 2 pro
+    nav.menu
+        ul.list.menu__list
+            - const menuList = ["О дроне", "Преимущества", "Характеристики", "Вопросы", "Контакты"]
+            for item in menuList
+                li
+                    a.menu__link(href='#')= item
+    .smallContainer
+        button.button.button--header Купить
+        a.tel(href="tel:+8-050-567-67-67") 8 (050) 567 67 67

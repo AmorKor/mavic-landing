@@ -1,0 +1,26 @@
+.slider__btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+
+    width: 100vw;
+    height: 60px;
+    border: none;
+
+    background-color: transparent;
+    background-image: url('../img/icons/slider_arrow.png');
+    background-size: 25px 12px;
+    background-repeat: no-repeat;
+    background-position: top 13px  left 50%;
+
+    transition: background-position 300ms ease;
+}
+
+.slider__btn:hover, .slider__btn:focus, .slider__btn:active {
+    border: none;
+    outline: none;
+    background-position: top 20px left 50%
+}
+
