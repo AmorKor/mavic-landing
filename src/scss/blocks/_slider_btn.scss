@@ -1,4 +1,4 @@
-.slider__btn {
+.sliderBtn {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -15,10 +15,14 @@
     background-repeat: no-repeat;
     background-position: top 13px  left 50%;
 
-    transition: background-position 300ms ease;
+    transition: all 300ms ease;
 }
 
-.slider__btn:hover, .slider__btn:focus, .slider__btn:active {
+.sliderBtn--disabled {
+    opacity: 0;
+}
+
+.sliderBtn:hover {
     border: none;
     outline: none;
     background-position: top 20px left 50%

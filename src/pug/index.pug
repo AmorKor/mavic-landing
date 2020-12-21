@@ -11,11 +11,19 @@ html
         link(rel='stylesheet' type='text/css' href='styles/main.css')
     body.body
         .background
-        .gradient
         include header
         main.pageContainer
-            .contentContainer  
+            .page  
                 include hero
-            //- .contentContainer  
+            .page.page--main  
                 include description
-        button.slider__btn
+            .page.page--main  
+                include advantages
+            .page.page--main  
+                include specs
+            .page.page--main  
+                include qa
+            .page.page--main  
+                include contacts
+        button.sliderBtn
+        script(src='app/app.js')

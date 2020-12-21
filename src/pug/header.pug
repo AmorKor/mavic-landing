@@ -6,7 +6,7 @@ header.header
         ul.list.menu__list
             - const menuList = ["О дроне", "Преимущества", "Характеристики", "Вопросы", "Контакты"]
             for item in menuList
-                li
+                li.menu__item
                     a.menu__link(href='#')= item
     .smallContainer
         button.button.button--header Купить

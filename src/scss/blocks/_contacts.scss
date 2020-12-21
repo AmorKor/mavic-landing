@@ -1,0 +1,119 @@
+.page__content {
+    grid-row: 2 / 3;
+    grid-column: 3 / 4;
+    align-self: center;
+
+    font-size: 10px;
+
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+// CONTACTS CARDS
+.contacts {
+    display: grid;
+    row-gap: 3em;
+    width: max-content;
+    height: min-content;
+}
+
+.content__contacts {
+    margin-right: 8.5em;
+}
+
+.contacts__card {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.contacts__title {
+    margin-bottom: 13px;
+}
+
+.contacts__phone {
+    margin-bottom: 5px;
+}
+
+.contacts__phone:hover,
+.contacts__mail:hover {
+    text-decoration: underline;
+}
+
+// INPUT FIELDS
+.content__form {
+    width: max-content;
+    height: min-content;
+    margin-right: 10.5em;
+}
+
+.form {
+    display: flex;
+    flex-flow: column nowrap;    
+}
+
+.form__inner {
+    padding: 0;
+    margin: 0;
+
+    border: none;
+}
+
+.form__title {
+    margin-bottom: .6em;
+}
+
+.form__text {
+    margin-bottom: .85em;
+}
+
+.form__inputs {
+    display: flex;
+    flex-flow: row wrap;
+
+    min-width: 570px;
+}
+
+.form__input {
+    flex: 0 1 calc(50% - 5px);
+    margin-bottom: 10px;
+}
+
+.form__input:first-child {
+    margin-right: 10px;
+}
+
+.form__textarea {
+    flex: 0 1 100%;
+
+    resize: none;
+}
+
+.form__input, .form__textarea {
+    border: none;
+    padding: 15px;
+
+    background-color: rgba(0, 0, 0, .5);
+
+    @include text-xs;
+    font-weight: 500;
+    color: #fff;
+}
+
+.form__button {
+    padding: .5em 1em;
+    margin-top: 1.3em;
+}
+
+// SOCIALS
+.socials--vertical {
+    flex-flow: column nowrap;
+
+    .socials__item:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 2.5em;
+    }
+}
+
+.content__socials.socials--vertical {
+    margin-top: 8.5em;
+}

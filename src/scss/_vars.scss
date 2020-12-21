@@ -1,0 +1,29 @@
+// maps for adaptivity
+    // monitors
+$m-screen-xl: (
+    'width': 2561px,
+    'height': 1601px
+);
+    
+$m-screen-l: (
+    'width': 1921px,
+    'height': 1081px
+);
+
+$m-screen-m: (
+    'width': 1367px,
+    'height': 769px
+);
+
+$m-screen-s: (
+    'width': 1281px,
+    'height': 721px
+);
+
+@function get-width($monitor-type) {
+    @return map-get($monitor-type, 'width')
+};
+
+@function get-height($monitor-type) {
+    @return map-get($monitor-type, 'height')
+};

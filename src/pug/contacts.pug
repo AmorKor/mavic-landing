@@ -1,0 +1,29 @@
+h1.title.page__title Контакты
+.content.page__content 
+    .contacts.content__contacts
+        .contacts__card
+            h4.title.title--s.contacts__title Киев
+            a(href='tel:+8-050-567-67-67').contacts__phone.text--s +8 (050) 567 67 67
+            a(href='mailto:dgi.mavic2pro.kiev@mail.ru').contacts__mail.text--s dgi.mavic2pro.kiev@mail.ru
+        .contacts__card
+            h4.title.title--s.contacts__title Москва
+            a(href='tel:+8-050-567-67-67').contacts__phone.text--s +8 (499) 567 67 67
+            a(href='mailto:dgi.mavic2pro.moscow@mail.ru').contacts__mail.text--s dgi.mavic2pro.moscow@mail.ru
+        .contacts__card
+            h4.title.title--s.contacts__title Минск
+            a(href='tel:+8-050-567-67-67').contacts__phone.text--s +8 (7517) 567 67 67
+            a(href='mailto:dgi.mavic2pro.minsk@mail.ru').contacts__mail.text--s dgi.mavic2pro.minsk@mail.ru
+    form.form.content__form
+        fieldset.form__inner
+            legend.title.title--s.form__title Остались вопросы?
+            p.form__text.text--s Мы обязательно свяжемся с вами в течение двух рабочих дней
+            .form__inputs
+                input(type='text' placeholder='Вашу имя' required).form__input
+                input(type='email' placeholder='Ваш e-mail' required).form__input
+                textarea.form__textarea(name="textarea", cols="30", rows="10" wrap='hard' placeholder='Что вас интересует?' required)
+            button.button.form__button Отправить
+    ul.socials.content__socials.socials--vertical
+        for img in ['fb', 'yt', 'ins']
+            li.socials__item
+                a.socials__link(href='#')
+                    img(src=`img/icons/${img}.png`, alt=`${img}`)

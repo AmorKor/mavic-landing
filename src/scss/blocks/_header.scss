@@ -12,7 +12,7 @@
 
 @media(max-width: 1300px) {
     .header {
-        margin: 0 8px;
+        margin: 0 16px;
     }
 }
 
@@ -22,6 +22,11 @@
     grid-auto-flow: column;
     column-gap: 11px;
     align-items: center;
+}
+
+.logo__title,
+.logo__img {
+    cursor: pointer;
 }
 
 .logo__title {
@@ -42,26 +47,18 @@
     grid-auto-flow: column;
     column-gap: 20px;
 }
+.menu__item {
+    transition: transform 150ms ease;
+}
+
+
+.menu__item--active {
+    transform: translateY(5px);
+}
 
 .menu__link {
     text-transform: uppercase;
     @include menu
-}
-
-// BUTTON
-.button {
-    background-color: transparent;
-    border: 1px solid #fff;
-    border-radius: 3px;
-
-    min-width: 115px;
-    min-height: 30px;
-    padding-top: 7px;
-    padding-bottom: 6px;
-
-    @include menu;
-    color: #fff;
-    text-transform: uppercase;
 }
 
 // TELEPHONE
@@ -69,6 +66,10 @@
     text-transform: uppercase;
     font-weight: 700;
     font-size: 16px;
+}
+
+.tel:hover {
+    text-decoration: underline;
 }
 
 
