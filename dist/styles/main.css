@@ -11,7 +11,7 @@ a {
 .title {
   font-size: 4.4em; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .title {
     font-size: 36px; } }
 
@@ -60,10 +60,11 @@ button:focus {
   display: flex;
   height: 100vh;
   flex-flow: column nowrap;
-  overflow: hidden; }
+  overflow: hidden;
+  align-items: center; }
 
 .pageContainer {
-  width: 100%;
+  width: calc(100vw - 60px);
   display: grid;
   grid-auto-rows: calc(100vh - 60px - 20px);
   place-items: center;
@@ -73,30 +74,32 @@ button:focus {
 
 .page {
   height: calc(100vh - 60px - 43px);
-  width: 1264px;
+  max-width: 1270px;
+  width: calc(100vw - 60px);
   font-size: 10px;
   display: grid;
   grid-template-columns: 25px 30px 1fr;
   grid-template-rows: 155px 1fr; }
 
-@media (max-width: 1281px) {
+@media (max-width: 1280px) and (max-height: 720px) {
   .page {
     grid-template-rows: 125px; } }
 
 .page--main {
   grid-row-gap: 53px; }
 
-@media (max-width: 1281px) {
+@media (max-width: 1280px) and (max-height: 720px) {
   .page--main {
     grid-row-gap: 30px; } }
 
-.background, .gradient {
+.background {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  height: 100vh; }
+  height: 100vh;
+  width: 100vw; }
 
 .background {
   background: url("../img/bg/Group.jpg");
@@ -158,13 +161,6 @@ button:focus {
   background-image: url("../img/icons/left-arrow-active.png");
   background-color: #fff; }
 
-.question__controller {
-  width: 6.8em;
-  height: 7.2em;
-  background-image: url("../img/icons/dropdown-arrow.png");
-  background-color: #fff;
-  background-size: 20px 13px; }
-
 .controller--left.controller--disabled:hover {
   background-image: url("../img/icons/left-arrow.png");
   background-color: #1C1C1C; }
@@ -183,9 +179,10 @@ button:focus {
   max-width: 1270px;
   margin: auto; }
 
-@media (max-width: 1300px) {
+@media (max-width: 1280px) and (max-height: 720px) {
   .header {
-    margin: 0 16px; } }
+    width: calc(100vw - 60px);
+    margin: 0 30px; } }
 
 .smallContainer {
   display: grid;
@@ -267,14 +264,14 @@ button:focus {
   align-self: center;
   max-height: 66em; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .page__hero {
     align-self: end; } }
 
 .hero__title {
   font-size: 9.6rem; }
 
-@media (min-height: 721px) {
+@media (min-height: 720px) {
   .hero__img {
     margin-top: 30px; } }
 
@@ -320,7 +317,7 @@ button:focus {
   row-gap: 30px;
   max-width: 440px; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .page__description {
     grid-template-rows: 100px;
     max-width: 400px; } }
@@ -405,7 +402,7 @@ button:focus {
   grid-template-columns: .5em 3em 55em 5em 55em;
   grid-template-rows: 2em 23em 2em 1fr; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .cards__wrapper {
     font-size: 9px; } }
 
@@ -493,7 +490,7 @@ button:focus {
   background-size: contain;
   background-repeat: no-repeat; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .cards__guidelines {
     left: 22em;
     height: 25em; } }
@@ -501,25 +498,52 @@ button:focus {
 .page__qa {
   grid-column: 3 / 4;
   grid-row: 2 / 3;
-  align-self: center; }
+  align-self: center;
+  justify-self: start;
+  width: 87%; }
+
+@media (max-width: 1200px) {
+  .page__qa {
+    width: 100%; } }
 
 .qa {
   display: flex;
-  grid-template-columns: 1fr 1fr; }
+  flex-flow: row nowrap; }
+
+.qa__wrapper {
+  width: 70%;
+  display: flex;
+  flex-flow: column nowrap; }
+
+@media (max-width: 1200px) {
+  .qa__wrapper {
+    width: 100%;
+    flex-flow: row wrap; } }
 
 .question {
-  width: 755px;
-  height: 72px;
   display: flex;
-  flex-flow: row nowrap;
-  height: min-content; }
+  flex-flow: row nowrap; }
 
 .qa__question {
+  height: min-content;
+  width: 100%;
+  max-width: 755px;
   font-size: 10px; }
 
-@media (max-width: 1281px) {
+@media (max-width: 1200px) {
+  .qa__question {
+    max-width: calc(50% - 10px); }
+  .qa__question:nth-child(1),
+  .qa__question:nth-child(3) {
+    margin-right: 10px; } }
+
+@media (max-width: 1280px) {
   .qa__question {
     font-size: 9px; } }
+
+@media (max-width: 1200px) {
+  .qa__question {
+    font-size: 8px; } }
 
 .question__text {
   width: 690px;
@@ -527,30 +551,52 @@ button:focus {
   background-color: rgba(0, 0, 0, 0.3);
   line-height: 130%;
   font-weight: 500;
-  font-size: 2.1em; }
+  font-size: 2.1em;
+  max-height: min-content;
+  overflow: hidden;
+  transition: height 300ms ease-in-out; }
 
 .question__text:not(:last-child) {
   margin-bottom: 5px; }
 
+.question__controller {
+  width: 67px;
+  height: 7.2em;
+  background-image: url("../img/icons/dropdown-arrow.png");
+  background-color: #fff;
+  background-size: 20px 13px;
+  transition: background-image 300ms ease-in-out; }
+
+.question__controller--active {
+  background-image: url("../img/icons/dropdown-arrow-active.png"); }
+
 .question__answer {
   font-size: .72em;
-  display: block;
+  display: none;
   padding-left: 10px;
   padding-top: 20px;
   min-height: min-content; }
 
-.qa__img {
-  height: min-content; }
+.question__answer--active {
+  display: block; }
 
-@media (max-width: 1281px) {
+.qa__img {
+  height: 28%;
+  width: 30%; }
+
+@media (max-width: 1280px) {
   .qa__img {
     margin-left: -5px; } }
+
+@media (max-width: 1200px) {
+  .qa__img {
+    display: none; } }
 
 .specs {
   position: relative;
   font-size: 10px; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .specs {
     font-size: 9px; } }
 
@@ -563,7 +609,7 @@ button:focus {
   align-items: start;
   justify-content: center; }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .specs__wrapper {
     grid-column-gap: 64em; } }
 
@@ -583,7 +629,7 @@ button:focus {
   background-repeat: no-repeat;
   background-image: url("../img/bg/specs_bg.png"); }
 
-@media (max-height: 721px) {
+@media (max-height: 720px) {
   .specs__background {
     left: 235px; } }
 
@@ -621,7 +667,8 @@ button:focus {
   align-self: center;
   font-size: 10px;
   display: flex;
-  flex-flow: row nowrap; }
+  flex-flow: row nowrap;
+  max-width: 1270px; }
 
 .contacts {
   display: grid;
@@ -630,7 +677,7 @@ button:focus {
   height: min-content; }
 
 .content__contacts {
-  margin-right: 8.5em; }
+  margin-right: calc((100% + 25px) * 0.066); }
 
 .contacts__card {
   display: flex;
@@ -647,9 +694,9 @@ button:focus {
   text-decoration: underline; }
 
 .content__form {
-  width: max-content;
+  margin-right: calc((100% + 25px) * 0.083);
   height: min-content;
-  margin-right: 10.5em; }
+  flex: 0 1 570px; }
 
 .form {
   display: flex;

@@ -62,14 +62,15 @@ class Slider {
             this.container.style.transform = `translateY(-${this.containerSize * desiredPage}px)`
         }
 
-        this.checkSliderState()
+        
+        this.container.addEventListener('transitionend', () => {
+            this.checkSliderState()
+        })
     }
     
     checkSliderState() {
-        this.container.addEventListener('transitionend', () => {
-            this.setActivePage()
-            this.checkButtons()
-        })
+        this.setActivePage()
+        this.checkButtons()
     }
     
     getShiftValue() {
@@ -99,11 +100,11 @@ class Slider {
 
     
     isInView(element, container, elemNum) {
-        const rect = element.getBoundingClientRect()
-        const wrapper = container.parentElement.getBoundingClientRect()
+        this.rect = element.getBoundingClientRect()
+        this.wrapper = container.parentElement.getBoundingClientRect()
                 
         return (
-            rect.left === wrapper.left
+            this.rect.left === this.wrapper.left
         )
     }
 
@@ -126,7 +127,6 @@ class Slider {
         } else if(this.activePage + 1 === this.pagesCollection.length && hasZeroSlider === false) {
             this.buttons[this.lastIndex].classList.add(this.buttonSelectors['disabled'].slice(1))
             this.buttons[this.lastIndex].setAttribute('disabled', '')
-            console.log(this.buttons[this.lastIndex])
         } else if(this.activePage === 0 && hasZeroSlider === false) {
             this.buttons[this.firstIndex].classList.add(this.buttonSelectors['disabled'].slice(1))
             this.buttons[this.firstIndex].setAttribute('disabled', '')
@@ -202,22 +202,19 @@ class PageSlider extends Slider {
     }
 
     isInView(element) {
-        const rect = element.getBoundingClientRect()
-
+        this.rect = element.getBoundingClientRect()
+        
         return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidht)
+            this.rect.top >= 0 &&
+            this.rect.left >= 0 &&
+            this.rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
         )
     }
 
     checkSliderState() {
-        this.container.addEventListener('transitionend', () => {
-            this.setActivePage()
-            this.checkButtons(true)
-            this.checkBackground()
-        })
+        this.setActivePage()
+        this.checkButtons(true)
+        this.checkBackground()
     }
 
     

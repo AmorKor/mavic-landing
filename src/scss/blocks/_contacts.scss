@@ -7,6 +7,7 @@
 
     display: flex;
     flex-flow: row nowrap;
+    max-width: 1270px;
 }
 
 // CONTACTS CARDS
@@ -18,8 +19,15 @@
 }
 
 .content__contacts {
-    margin-right: 8.5em;
+    // margin-right: 8.5em;
+    margin-right: calc((100% + 25px) * 0.066);
+
 }
+
+// @media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
+//     .content__contacts {
+//     }
+// }
 
 .contacts__card {
     display: flex;
@@ -39,11 +47,19 @@
     text-decoration: underline;
 }
 
-// INPUT FIELDS
+// // INPUT FIELDS
+// @media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
+//     .content__form {
+//     }
+// }
+
 .content__form {
-    width: max-content;
+    margin-right: calc((100% + 25px) * 0.083);
+    // width: max-content;
     height: min-content;
-    margin-right: 10.5em;
+    // margin-right: 10.5em;
+
+    flex: 0 1 570px;
 }
 
 .form {

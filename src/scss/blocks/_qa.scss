@@ -3,29 +3,74 @@
     grid-row: 2 / 3;
 
     align-self: center;
+    justify-self: start;
+
+    width: 87%;
 }
+
+@media(max-width: 1200px) {
+    .page__qa {
+        width: 100%
+    }
+}
+
 
 .qa {
     display: flex;
-    grid-template-columns: 1fr 1fr;
+    flex-flow: row nowrap
 }
 
+.qa__wrapper {
+    width: 70%;
+
+    display: flex;
+    flex-flow: column nowrap;
+
+}
+
+@media(max-width: 1200px) {
+    .qa__wrapper {
+        width: 100%;
+
+        flex-flow: row wrap;
+    }
+}
+
+
 .question {
-    width: 755px;
-    height: 72px;
     display: flex;
     flex-flow: row nowrap;
-
-    height: min-content;
+    
 }
 
 .qa__question {
+    height: min-content;
+    width: 100%;
+    max-width: 755px;
     font-size: 10px;
 }
+
+@media(max-width: 1200px) {
+    .qa__question {
+        max-width: calc(50% - 10px)
+    }
+
+    .qa__question:nth-child(1),
+    .qa__question:nth-child(3) {
+        margin-right: 10px;
+    }
+}
+
 
 @media(max-width: get-width($m-screen-s)) {
     .qa__question {
         font-size: 9px;
+    }
+}
+
+@media(max-width: 1200px) {
+    .qa__question {
+        font-size: 8px;
     }
 }
 
@@ -37,28 +82,58 @@
     line-height: 130%;
     font-weight: 500;
     font-size: 2.1em;
+
+    max-height: min-content;
+    overflow: hidden;
+
+    transition: height 300ms ease-in-out;
 }
 
 .question__text:not(:last-child) {
     margin-bottom: 5px;
 }
 
+.question__controller {
+    width: 67px;
+    height: 7.2em;
+    
+    background-image: url('../img/icons/dropdown-arrow.png');
+    background-color: #fff;
+    background-size: 20px 13px;
+
+    transition: background-image 300ms ease-in-out;
+}
+
+.question__controller--active {
+    background-image: url('../img/icons/dropdown-arrow-active.png')
+}
 
 .question__answer {
     font-size: .72em;
     
-    display: block;
+    display: none;
     padding-left: 10px;
     padding-top: 20px;
     min-height: min-content;
 }
 
+.question__answer--active {
+    display: block;
+}
+
 .qa__img {
-    height: min-content;
+    height: 28%;
+    width: 30%
 }
 
 @media(max-width: get-width($m-screen-s)) {
     .qa__img {
         margin-left: -5px;
+    }
+}
+
+@media(max-width: 1200px) {
+    .qa__img {
+        display: none;
     }
 }

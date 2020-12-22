@@ -1,23 +1,28 @@
 // maps for adaptivity
     // monitors
 $m-screen-xl: (
-    'width': 2561px,
-    'height': 1601px
+    'width': 2560px,
+    'height': 1600px
 );
     
 $m-screen-l: (
-    'width': 1921px,
-    'height': 1081px
+    'width': 1920px,
+    'height': 1080px
 );
 
 $m-screen-m: (
-    'width': 1367px,
-    'height': 769px
+    'width': 1368px,
+    'height': 768px
 );
 
 $m-screen-s: (
-    'width': 1281px,
-    'height': 721px
+    'width': 1280px,
+    'height': 720px
+);
+
+$m-screen-xs: (
+    'width': 1024px,
+    'height': 600px
 );
 
 @function get-width($monitor-type) {

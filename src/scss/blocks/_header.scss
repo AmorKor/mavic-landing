@@ -10,9 +10,10 @@
     margin: auto;
 }
 
-@media(max-width: 1300px) {
+@media (max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
     .header {
-        margin: 0 16px;
+        width: calc(100vw - 60px);
+        margin: 0 30px;
     }
 }
 

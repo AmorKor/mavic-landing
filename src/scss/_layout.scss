@@ -4,13 +4,15 @@
     height: 100vh;
     flex-flow: column nowrap;
     overflow: hidden;
+
+    align-items: center
 }
 
 
 // MAIN CONTAINER LAYOUT
 
 .pageContainer {
-    width: 100%;
+    width: calc(100vw - 60px);
     
     display: grid;
     grid-auto-rows: calc(100vh - 60px - 20px);
@@ -23,20 +25,22 @@
 
 .page {
     height: calc(100vh - 60px - 43px);
-    width: 1264px;
+    max-width: 1270px;
+    width: calc(100vw - 60px);
 
     // for ems
     font-size: 10px;
 
-    
     display: grid;
     grid-template-columns: 25px 30px 1fr;
     grid-template-rows: 155px 1fr;
 }
 
-@media(max-width: get-width($m-screen-s)) {
+
+
+@media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
     .page {
-        grid-template-rows: 125px
+        grid-template-rows: 125px;
     }
 }
 
@@ -44,13 +48,14 @@
     grid-row-gap: 53px;
 }
 
-@media(max-width: get-width($m-screen-s)) {
+@media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
     .page--main {
         grid-row-gap: 30px;
     }
 }
+
 // BACKGROUND
-.background, .gradient {
+.background {
     position: absolute;
     top: 0;
     right: 0;
@@ -58,6 +63,7 @@
     left: 0;
 
     height: 100vh;
+    width: 100vw;
 }
 
 .background {
