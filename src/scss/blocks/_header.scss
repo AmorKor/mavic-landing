@@ -48,18 +48,17 @@
     grid-auto-flow: column;
     column-gap: 20px;
 }
-.menu__item {
-    transition: transform 150ms ease;
-}
-
-
-.menu__item--active {
-    transform: translateY(5px);
-}
 
 .menu__link {
+    transition: transform 150ms ease;
+    display: inline-block;
+
     text-transform: uppercase;
     @include menu
+}
+
+.menu__link--active {
+    transform: translateY(5px);
 }
 
 // TELEPHONE

@@ -7,6 +7,7 @@ const ccso = require('gulp-csso')
 const htmlmin = require('gulp-htmlmin')
 const del = require('del')
 const concat = require('gulp-concat')
+const tsc = require('gulp-typescript') 
 
 function compilePug() {
     return src('./src/pug/index.pug')
@@ -24,13 +25,26 @@ function compileSass() {
             .pipe(dest('dist/styles'))
 }
 
-function createJSBundle() {
-    return src('./src/app/**.js')
+function compileTS() {
+    return src('./src/app/**.ts')
             .pipe(sourcemap.init())
-                .pipe(concat('app.js'))
+            .pipe(tsc({
+                outFile: 'app.js',
+                target: 'ES6',
+                removeComments: true
+            }))
+            // .pipe(concat('app.js'))
             .pipe(sourcemap.write('.'))
             .pipe(dest('./dist/app'))
 }
+
+// function createJSBundle() {
+//     return src('./src/app/**.js')
+//             .pipe(sourcemap.init())
+//                 .pipe(concat('app.js'))
+//             .pipe(sourcemap.write('.'))
+//             .pipe(dest('./dist/app'))
+// }
 
 function runServer() {
     sync.init({
@@ -39,7 +53,7 @@ function runServer() {
 
     watch('./src/pug/**.pug', series(compilePug)).on('change', sync.reload)
     watch('./src/scss/**/**.scss', series(compileSass)).on('change', sync.reload)
-    watch('./src/app/**.js', series(createJSBundle)).on('change', sync.reload)
+    watch('./src/app/**.ts', series(compileTS)).on('change', sync.reload)
 }
 
 function stopServer(cb) {
