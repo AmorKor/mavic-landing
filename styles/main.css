@@ -66,14 +66,14 @@ button:focus {
 .pageContainer {
   width: calc(100vw - 60px);
   display: grid;
-  grid-auto-rows: calc(100vh - 60px - 20px);
+  grid-auto-rows: 100vh;
   place-items: center;
-  grid-gap: 60px;
   z-index: 1;
   transition: transform 500ms ease-in-out; }
 
 .page {
-  height: calc(100vh - 60px - 43px);
+  height: 100vh;
+  padding-bottom: 90px;
   max-width: 1270px;
   width: calc(100vw - 60px);
   font-size: 10px;
@@ -209,16 +209,15 @@ button:focus {
   grid-auto-flow: column;
   column-gap: 20px; }
 
-.menu__item {
-  transition: transform 150ms ease; }
-
-.menu__item--active {
-  transform: translateY(5px); }
-
 .menu__link {
+  transition: transform 150ms ease;
+  display: inline-block;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 1.5em; }
+
+.menu__link--active {
+  transform: translateY(5px); }
 
 .tel {
   text-transform: uppercase;
