@@ -41,39 +41,40 @@ class Slide implements ISlide {
 
 interface IController {
     DOMNode: Element
-    selectorDisabled: string
+    activeSelector: string
+    isActive: boolean
 
-    disable(): void
-    enable(): void
+    invertState(): void
 }
 
 class Controller implements IController {
-    DOMNode
-    selectorDisabled
+    DOMNode: Element = null
+    activeSelector: string = null
+    isActive = false
 
     constructor(
         node: Element,
-        CSSselectorDisabled: string
+        CSSselectorActive: string,
+        isActive: boolean
     ) {
         this.DOMNode = node
-        this.selectorDisabled = CSSselectorDisabled.slice(1)
+        this.activeSelector = CSSselectorActive.slice(1)
+        this.isActive = isActive
     }
 
-    disable() {
-        this.DOMNode.classList.add(this.selectorDisabled)
-    }
-    
-    enable() {
-        this.DOMNode.classList.remove(this.selectorDisabled)
-        this.DOMNode.removeAttribute('disabled')
+    invertState() {
+        if(this.isActive) {
+            this.DOMNode.classList.add(this.activeSelector)
+            this.DOMNode.removeAttribute('disabled')
+        } else {
+            this.DOMNode.classList.remove(this.activeSelector)
+            this.DOMNode.setAttribute('disabled', '')
+        }
     }
 }
 
 interface ISlider {
-    track: {
-        DOMNode: HTMLElement | null,
-        sliders: Array<ISlide>
-    }
+    track: HTMLElement | null,
     controllers: Array<IController>
     isVertical: boolean
 
@@ -83,18 +84,18 @@ interface ISlider {
 }
 
 class Slider implements ISlider {
-    track = null
-    controllers = []
-    isVertical = false
+    track: HTMLElement | null = null
+    controllers: Array<IController> = []
+    isVertical: boolean = false
 
-    head = null
-    tail = null
-    currentSlide = null
+    head: ISlide | null = null
+    tail: ISlide | null = null
+    currentSlide: ISlide | null = null
     
     constructor(
         CSStrackSelector: string,
         CSScontrollerSelector: string,
-        CSScontrollerSelectorDisabled: string,
+        CSScontrollerSelectorActive: string,
         isVertical?: boolean
     ) {
         this.track = document.querySelector(CSStrackSelector)
@@ -103,7 +104,8 @@ class Slider implements ISlider {
         for(let controller of controllersSet) {
             this.controllers.push(new Controller(
                 controller, 
-                CSScontrollerSelectorDisabled
+                CSScontrollerSelectorActive,
+                controller.classList.contains(CSScontrollerSelectorActive.slice(1))
             ))
         }
 
@@ -159,27 +161,27 @@ class Slider implements ISlider {
         return this
     }
     
-    toArray(): Array<Slide> | null {
-        if(!this.head) return null
+    // toArray(): Array<Slide> | null {
+    //     if(!this.head) return null
 
-        let currentSlide = this.head
-        const slidersArray = []
+    //     let currentSlide = this.head
+    //     const slidersArray = []
 
-        if(!this.tail) {
-            slidersArray.push(currentSlide)
+    //     if(!this.tail) {
+    //         slidersArray.push(currentSlide)
 
-            return slidersArray
-        } 
+    //         return slidersArray
+    //     } 
         
-        let i = 0
-        while(currentSlide) {
-            slidersArray.push(currentSlide)
+    //     let i = 0
+    //     while(currentSlide) {
+    //         slidersArray.push(currentSlide)
 
-            currentSlide = currentSlide.next
-        }
+    //         currentSlide = currentSlide.next
+    //     }
 
-        return slidersArray
-    }
+    //     return slidersArray
+    // }
     
     toNext(slideNum?: number): Slide | null {
         if(!this.head) return null
@@ -203,15 +205,29 @@ class Slider implements ISlider {
 
         if(slideNum !== undefined) {
             while(_slideNum !== this.currentSlide.params.number) {
-                this.currentSlide = this.currentSlide.next
-            }
+				this.currentSlide = this.currentSlide.next
+				
+				if(
+					this.currentSlide.params.height !== this.currentSlide.prev.params.height ||
+					this.currentSlide.params.width !== this.currentSlide.prev.params.width
+				) this.currentSlide.calcSize()		
+			}
+			
+			
         } else {
             if(this.currentSlide.next) {
                 this.currentSlide = this.currentSlide.next
-            }            
+			}            
+			
+			if(
+				this.currentSlide.params.height !== this.currentSlide.prev.params.height ||
+				this.currentSlide.params.width !== this.currentSlide.prev.params.width
+			) this.currentSlide.calcSize()	
         }
         
         this.checkController()
+
+
         
         return this.currentSlide
     } 
@@ -238,48 +254,70 @@ class Slider implements ISlider {
 
         if(slideNum !== undefined) {
             while(_slideNum !== this.currentSlide.params.number) {
-                this.currentSlide = this.currentSlide.prev
+				this.currentSlide = this.currentSlide.prev
+				
+				if(
+					this.currentSlide.params.height !== this.currentSlide.next.params.height ||
+					this.currentSlide.params.width !== this.currentSlide.next.params.width
+				) this.currentSlide.calcSize()
             }
         } else {
             if(this.currentSlide.prev) {
                 this.currentSlide = this.currentSlide.prev
-            }
+			}
+			
+			if(
+				this.currentSlide.params.height !== this.currentSlide.next.params.height ||
+				this.currentSlide.params.width !== this.currentSlide.next.params.width
+			) this.currentSlide.calcSize()
         }
 
+        
         this.checkController()
+		
         
         return this.currentSlide
     } 
 
+    fixPosition(): void {
+        this.currentSlide.calcSize()
+        const newHeight = this.currentSlide.params.height
+
+        this.track.style.transform = `translateY(-${newHeight * this.currentSlide.params.number}px)`        
+    }
+    
     // disables respective controller if no more slides to show
     protected checkController(): void {
         const prevBtn = this.controllers[0]
         const nextBtn = this.controllers[1]
-        
-        if(!this.currentSlide.next) {
-            nextBtn.disable()
-        } else {
-            nextBtn.enable()
-        }
 
-        if(!this.currentSlide.prev) {
-            prevBtn.disable()
+        if(!this.currentSlide.next) {
+            nextBtn.isActive = false
+            nextBtn.invertState()
         } else {
-            prevBtn.enable()
+            nextBtn.isActive = true
+            nextBtn.invertState()
         }
+        
+        if(!this.currentSlide.prev) {
+            prevBtn.isActive = false
+            prevBtn.invertState()
+        } else {
+            prevBtn.isActive = true
+            prevBtn.invertState()
+        }        
     }
 }
 
 const slider = new Slider(
     '.slider__inner',
     '.slider__controller',
-    '.controller--disabled'
+    '.controller--active'
 )
 
 console.log(slider.init('.slider__img'))
 
 document.querySelector('.buttonContainer').addEventListener('click', e => {
-    const selectorDisabled = slider.controllers[0].selectorDisabled
     const prevBtn = slider.controllers[0]
     const nextBtn = slider.controllers[1]
 
@@ -294,7 +332,19 @@ document.querySelector('.buttonContainer').addEventListener('click', e => {
     }
 })
 
-class PageSlider extends Slider {
+interface IPageSlider extends ISlider {
+    background: {
+        DOMNode: Element | null,
+        selectorActive: string
+    }
+}
+
+class PageSlider extends Slider implements IPageSlider {
+    background: {
+        DOMNode: Element | null,
+        selectorActive: string
+    } = null
+        
     jumpTo(page: number): Slide | null {
         let _currentSlide: Slide | null
                 
@@ -303,14 +353,41 @@ class PageSlider extends Slider {
         if(page < this.currentSlide.params.number) _currentSlide = this.toPrev(page)
         else _currentSlide = this.toNext(page)
 
+        pageSlider.checkBackground()
+        
         return _currentSlide
     }
 
+    setBackground(CSSBackgroundSelector: string, CSSBackgroundSelectorActive: string): Object {
+        this.background = {
+            DOMNode: document.querySelector(CSSBackgroundSelector),
+            selectorActive: CSSBackgroundSelectorActive.slice(1)
+        }
+
+        return this.background
+    }
+    
+    checkBackground(): void {
+        if(!this.background) throw new Error('background isn\'t set yet')
+
+        if(this.currentSlide.params.number === 0) {
+            this.background.DOMNode.classList.remove(
+                this.background.selectorActive
+            )
+        } else {
+            this.background.DOMNode.classList.add(
+                this.background.selectorActive
+            )
+        }
+    }
+        
     protected checkController(): void {
         if(!this.currentSlide.next) {
-            this.controllers[0].disable()
+            this.controllers[0].isActive = false
+            this.controllers[0].invertState()
         } else {
-            this.controllers[0].enable()
+            this.controllers[0].isActive = true
+            this.controllers[0].invertState()
         }
     }
 }
@@ -318,26 +395,34 @@ class PageSlider extends Slider {
 const pageSlider = new PageSlider(
     '.pageContainer',
     '.sliderBtn',
-    '.sliderBtn--disabled',
+    '.sliderBtn--active',
     true
 )
 
 pageSlider.init('.page')
+pageSlider.setBackground(
+    '.background',
+    '.background--main'
+)
 
 console.log(pageSlider)
 
+// change slide on bottom button clicking
 pageSlider.controllers[0].DOMNode.addEventListener('click', () => {
     pageSlider.toNext()
+    pageSlider.checkBackground()
+
+    navPublisher.setState(
+        navPublisher.observers[
+            pageSlider.currentSlide.params.number
+        ].DOMNode
+    )
 })
 
-interface IPublisher {
-    state: any,
-    observers: Array<IControllerObserver>
-    
-    attach(observer: IControllerObserver): void
-    detach(observer: IControllerObserver): void
-    notify(): void
-}
+// fix slide postion on window resize
+window.addEventListener('resize', () => {
+    pageSlider.fixPosition()
+})
 
 interface IControllerObserver extends IController{
     update(state: any): void
@@ -348,13 +433,28 @@ class NavController extends Controller implements IControllerObserver {
         if(activeController) {
             if(activeController === this) {
                 pageSlider.jumpTo(
-                    (navPusblisher.observers.indexOf(activeController))
+                    (navPublisher.observers.indexOf(activeController))
                 )
-               return 
+
+                this.isActive = true
+                this.invertState()
+
+                return 
             }
             
+            this.isActive = false
+            this.invertState()
         }
     }
+}
+
+interface IPublisher {
+    state: any,
+    observers: Array<IControllerObserver>
+    
+    attach(observer: IControllerObserver): void
+    detach(observer: IControllerObserver): void
+    notify(): void
 }
 
 class Publisher implements IPublisher {
@@ -376,21 +476,8 @@ class Publisher implements IPublisher {
             controller.update(this.state)
         }
     }
-}
 
-class NavPusblisher extends Publisher {
-    init(
-        CSSControllerSelector: string,
-        CSSDisabledSelector: string
-    ) {
-        const controllers = document.querySelectorAll(CSSControllerSelector)
-
-        for(let controller of controllers) {
-            this.attach(new NavController(controller, CSSDisabledSelector))
-        }
-    }
-
-    setState(node: EventTarget): void {
+    setState(node: any): void {
         for(let observer of this.observers) {
             if(observer.DOMNode === node){
                 this.state = observer
@@ -402,32 +489,123 @@ class NavPusblisher extends Publisher {
     }
 }
 
-const navPusblisher = new NavPusblisher()
-navPusblisher.attach(
+function attachGroup(publisher, subscriberClass, CSSSubscriberSelector, CSSSubscriberSelectorActive) {
+    const subscribers = [...document.querySelectorAll(CSSSubscriberSelector)]
+    
+    for(let subscriber of subscribers) {
+        publisher.attach(new subscriberClass(
+            subscriber,
+            CSSSubscriberSelectorActive,
+            subscriber.classList.contains(CSSSubscriberSelectorActive)
+        ))
+    }
+}
+
+const navPublisher = new Publisher()
+
+navPublisher.attach(
     new NavController(
         document.querySelector('.logo__title'),
-        ''
+        '.placeholder',
+        false
     )
 )
-navPusblisher.init(
+
+attachGroup(
+    navPublisher,
+    NavController,
     '.menu__link',
     '.menu__link--active'
 )
-console.log(navPusblisher)
 
-document.querySelector('.header').addEventListener('click', e => {        
-    console.log(e.target)
-    
-    for(let i = 0; i < navPusblisher.observers.length; i++) {
-        if(e.target === navPusblisher.observers[i].DOMNode) {
-            console.log(navPusblisher.observers[i].DOMNode)
-            navPusblisher.setState(e.target)
-            return
-        }
-    }
+console.log(navPublisher)
+
+// run event processing to navigation menu
+document.querySelector('.header').addEventListener('click', e => {            
+    navPublisher.setState(e.target)
 })
 
+// adding zero button functionality to logo img (return page slider to initial state)
 document.querySelector('.logo__img').addEventListener('click', () => {
     pageSlider.track.removeAttribute('style')
     pageSlider.currentSlide = pageSlider.head
+})
+
+interface IControlledEl extends IController {}
+
+class ControlledEl extends Controller implements IControlledEl {}
+
+interface IQAController extends IControllerObserver {
+    controlledElement: IControlledEl
+}
+
+class QAController extends Controller implements IQAController {
+    controlledElement: IControlledEl = null
+    
+    bindContent(contentNode: Element, CSSContentSelectorActive) {
+        this.controlledElement = new ControlledEl(
+            contentNode,
+            CSSContentSelectorActive,
+            contentNode.classList.contains(CSSContentSelectorActive)
+        )
+    }
+    
+    invertState() {
+        if(this.isActive) {
+            this.DOMNode.classList.add(this.activeSelector)
+        } else {
+            this.DOMNode.classList.remove(this.activeSelector)
+        }
+    }
+    
+    update(activeController: IControllerObserver) {
+        if(activeController === this) {
+            if(this.isActive) {
+                this.isActive = false
+                this.controlledElement.isActive = false
+            } else {
+                this.isActive = true
+                this.controlledElement.isActive = true
+            }
+            this.invertState()
+            this.controlledElement.invertState()
+            
+            return
+        }
+        
+        this.controlledElement.isActive = false
+        this.isActive = false
+        this.invertState()
+        this.controlledElement.invertState()
+    }
+}
+
+const qaPublisher = new Publisher()
+
+attachGroup(
+    qaPublisher,
+    QAController,
+    '.question__controller',
+    '.question__controller--active'
+)
+
+function bindGroup(publisher, CSSContentSelector, CSSContentSelectorActive) {
+    const group = document.querySelectorAll(CSSContentSelector)
+    
+    for(let i = 0; i < group.length; i++) {
+        publisher.observers[i].bindContent(group[i], CSSContentSelectorActive)
+
+    }
+}
+
+bindGroup(
+    qaPublisher,
+    '.question__answer',
+    '.question__answer--active'
+) 
+
+console.log(qaPublisher)
+
+document.querySelector('.qa__wrapper').addEventListener('click', e => {            
+    qaPublisher.setState(e.target)
 })

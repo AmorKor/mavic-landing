@@ -47,23 +47,23 @@
     background-image: url('../img/icons/right-arrow.png');
 }
 
-.controller--left:hover {
+.controller--left.controller--active:hover {
     background-image: url('../img/icons/right-arrow-active.png');
     background-color: #fff;
 }
 
-.controller--right:hover {
+.controller--right.controller--active:hover {
     background-image: url('../img/icons/left-arrow-active.png');
     background-color: #fff;
 }
 
 
-.controller--left.controller--disabled:hover {
+.controller--left:hover {
     background-image: url('../img/icons/left-arrow.png');
     background-color: #1C1C1C;
 }
 
-.controller--right.controller--disabled:hover {
+.controller--right:hover {
     background-image: url('../img/icons/right-arrow.png');
     background-color: #1C1C1C;
 }

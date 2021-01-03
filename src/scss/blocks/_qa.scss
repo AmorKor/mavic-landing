@@ -74,9 +74,10 @@
     }
 }
 
-.question__text {
+.question__inner {
     width: 690px;
-    padding: .95em 1.9em 1.14em;
+    // padding: .95em 1.9em 1.14em;
+    padding: .95em 1.9em 0;
     background-color: rgba(0,0,0,.3);
 
     line-height: 130%;
@@ -86,10 +87,9 @@
     max-height: min-content;
     overflow: hidden;
 
-    transition: height 300ms ease-in-out;
 }
 
-.question__text:not(:last-child) {
+.question__inner:not(:last-child) {
     margin-bottom: 5px;
 }
 
@@ -108,17 +108,23 @@
     background-image: url('../img/icons/dropdown-arrow-active.png')
 }
 
+.question__text {
+    display: block;
+    margin-bottom: 1.14em;
+}
+
 .question__answer {
     font-size: .72em;
     
-    display: none;
-    padding-left: 10px;
-    padding-top: 20px;
-    min-height: min-content;
+    overflow: hidden;
+    height: 0;
+    box-sizing: content-box;
+    display: block;
+    transition: height 300ms ease-in-out;
 }
 
 .question__answer--active {
-    display: block;
+    height: 15ch;
 }
 
 .qa__img {
