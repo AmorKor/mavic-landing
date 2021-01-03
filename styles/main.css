@@ -153,19 +153,19 @@ button:focus {
 .controller--right {
   background-image: url("../img/icons/right-arrow.png"); }
 
-.controller--left:hover {
+.controller--left.controller--active:hover {
   background-image: url("../img/icons/right-arrow-active.png");
   background-color: #fff; }
 
-.controller--right:hover {
+.controller--right.controller--active:hover {
   background-image: url("../img/icons/left-arrow-active.png");
   background-color: #fff; }
 
-.controller--left.controller--disabled:hover {
+.controller--left:hover {
   background-image: url("../img/icons/left-arrow.png");
   background-color: #1C1C1C; }
 
-.controller--right.controller--disabled:hover {
+.controller--right:hover {
   background-image: url("../img/icons/right-arrow.png");
   background-color: #1C1C1C; }
 
@@ -233,6 +233,7 @@ button:focus {
   left: 0;
   right: 0;
   z-index: 4;
+  opacity: 0;
   width: 100vw;
   height: 60px;
   border: none;
@@ -243,8 +244,8 @@ button:focus {
   background-position: top 13px  left 50%;
   transition: all 300ms ease; }
 
-.sliderBtn--disabled {
-  opacity: 0; }
+.sliderBtn--active {
+  opacity: 1; }
 
 .sliderBtn:hover {
   border: none;
@@ -544,18 +545,17 @@ button:focus {
   .qa__question {
     font-size: 8px; } }
 
-.question__text {
+.question__inner {
   width: 690px;
-  padding: .95em 1.9em 1.14em;
+  padding: .95em 1.9em 0;
   background-color: rgba(0, 0, 0, 0.3);
   line-height: 130%;
   font-weight: 500;
   font-size: 2.1em;
   max-height: min-content;
-  overflow: hidden;
-  transition: height 300ms ease-in-out; }
+  overflow: hidden; }
 
-.question__text:not(:last-child) {
+.question__inner:not(:last-child) {
   margin-bottom: 5px; }
 
 .question__controller {
@@ -569,15 +569,20 @@ button:focus {
 .question__controller--active {
   background-image: url("../img/icons/dropdown-arrow-active.png"); }
 
+.question__text {
+  display: block;
+  margin-bottom: 1.14em; }
+
 .question__answer {
   font-size: .72em;
-  display: none;
-  padding-left: 10px;
-  padding-top: 20px;
-  min-height: min-content; }
+  overflow: hidden;
+  height: 0;
+  box-sizing: content-box;
+  display: block;
+  transition: height 300ms ease-in-out; }
 
 .question__answer--active {
-  display: block; }
+  height: 15ch; }
 
 .qa__img {
   height: 28%;

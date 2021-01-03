@@ -17,20 +17,27 @@ class Slide {
     }
 }
 class Controller {
-    constructor(node, CSSselectorDisabled) {
+    constructor(node, CSSselectorActive, isActive) {
+        this.DOMNode = null;
+        this.activeSelector = null;
+        this.isActive = false;
         this.DOMNode = node;
-        this.selectorDisabled = CSSselectorDisabled.slice(1);
+        this.activeSelector = CSSselectorActive.slice(1);
+        this.isActive = isActive;
     }
-    disable() {
-        this.DOMNode.classList.add(this.selectorDisabled);
-    }
-    enable() {
-        this.DOMNode.classList.remove(this.selectorDisabled);
-        this.DOMNode.removeAttribute('disabled');
+    invertState() {
+        if (this.isActive) {
+            this.DOMNode.classList.add(this.activeSelector);
+            this.DOMNode.removeAttribute('disabled');
+        }
+        else {
+            this.DOMNode.classList.remove(this.activeSelector);
+            this.DOMNode.setAttribute('disabled', '');
+        }
     }
 }
 class Slider {
-    constructor(CSStrackSelector, CSScontrollerSelector, CSScontrollerSelectorDisabled, isVertical) {
+    constructor(CSStrackSelector, CSScontrollerSelector, CSScontrollerSelectorActive, isVertical) {
         this.track = null;
         this.controllers = [];
         this.isVertical = false;
@@ -40,7 +47,7 @@ class Slider {
         this.track = document.querySelector(CSStrackSelector);
         const controllersSet = document.querySelectorAll(CSScontrollerSelector);
         for (let controller of controllersSet) {
-            this.controllers.push(new Controller(controller, CSScontrollerSelectorDisabled));
+            this.controllers.push(new Controller(controller, CSScontrollerSelectorActive, controller.classList.contains(CSScontrollerSelectorActive.slice(1))));
         }
         if (!isVertical)
             this.isVertical = false;
@@ -84,22 +91,6 @@ class Slider {
         });
         return this;
     }
-    toArray() {
-        if (!this.head)
-            return null;
-        let currentSlide = this.head;
-        const slidersArray = [];
-        if (!this.tail) {
-            slidersArray.push(currentSlide);
-            return slidersArray;
-        }
-        let i = 0;
-        while (currentSlide) {
-            slidersArray.push(currentSlide);
-            currentSlide = currentSlide.next;
-        }
-        return slidersArray;
-    }
     toNext(slideNum) {
         if (!this.head)
             return null;
@@ -119,12 +110,18 @@ class Slider {
         if (slideNum !== undefined) {
             while (_slideNum !== this.currentSlide.params.number) {
                 this.currentSlide = this.currentSlide.next;
+                if (this.currentSlide.params.height !== this.currentSlide.prev.params.height ||
+                    this.currentSlide.params.width !== this.currentSlide.prev.params.width)
+                    this.currentSlide.calcSize();
             }
         }
         else {
             if (this.currentSlide.next) {
                 this.currentSlide = this.currentSlide.next;
             }
+            if (this.currentSlide.params.height !== this.currentSlide.prev.params.height ||
+                this.currentSlide.params.width !== this.currentSlide.prev.params.width)
+                this.currentSlide.calcSize();
         }
         this.checkController();
         return this.currentSlide;
@@ -148,37 +145,51 @@ class Slider {
         if (slideNum !== undefined) {
             while (_slideNum !== this.currentSlide.params.number) {
                 this.currentSlide = this.currentSlide.prev;
+                if (this.currentSlide.params.height !== this.currentSlide.next.params.height ||
+                    this.currentSlide.params.width !== this.currentSlide.next.params.width)
+                    this.currentSlide.calcSize();
             }
         }
         else {
             if (this.currentSlide.prev) {
                 this.currentSlide = this.currentSlide.prev;
             }
+            if (this.currentSlide.params.height !== this.currentSlide.next.params.height ||
+                this.currentSlide.params.width !== this.currentSlide.next.params.width)
+                this.currentSlide.calcSize();
         }
         this.checkController();
         return this.currentSlide;
+    }
+    fixPosition() {
+        this.currentSlide.calcSize();
+        const newHeight = this.currentSlide.params.height;
+        this.track.style.transform = `translateY(-${newHeight * this.currentSlide.params.number}px)`;
     }
     checkController() {
         const prevBtn = this.controllers[0];
         const nextBtn = this.controllers[1];
         if (!this.currentSlide.next) {
-            nextBtn.disable();
+            nextBtn.isActive = false;
+            nextBtn.invertState();
         }
         else {
-            nextBtn.enable();
+            nextBtn.isActive = true;
+            nextBtn.invertState();
         }
         if (!this.currentSlide.prev) {
-            prevBtn.disable();
+            prevBtn.isActive = false;
+            prevBtn.invertState();
         }
         else {
-            prevBtn.enable();
+            prevBtn.isActive = true;
+            prevBtn.invertState();
         }
     }
 }
-const slider = new Slider('.slider__inner', '.slider__controller', '.controller--disabled');
+const slider = new Slider('.slider__inner', '.slider__controller', '.controller--active');
 console.log(slider.init('.slider__img'));
 document.querySelector('.buttonContainer').addEventListener('click', e => {
-    const selectorDisabled = slider.controllers[0].selectorDisabled;
     const prevBtn = slider.controllers[0];
     const nextBtn = slider.controllers[1];
     if (e.target === nextBtn.DOMNode) {
@@ -191,6 +202,10 @@ document.querySelector('.buttonContainer').addEventListener('click', e => {
     }
 });
 class PageSlider extends Slider {
+    constructor() {
+        super(...arguments);
+        this.background = null;
+    }
     jumpTo(page) {
         let _currentSlide;
         if (page === this.currentSlide.params.number)
@@ -199,30 +214,60 @@ class PageSlider extends Slider {
             _currentSlide = this.toPrev(page);
         else
             _currentSlide = this.toNext(page);
+        pageSlider.checkBackground();
         return _currentSlide;
+    }
+    setBackground(CSSBackgroundSelector, CSSBackgroundSelectorActive) {
+        this.background = {
+            DOMNode: document.querySelector(CSSBackgroundSelector),
+            selectorActive: CSSBackgroundSelectorActive.slice(1)
+        };
+        return this.background;
+    }
+    checkBackground() {
+        if (!this.background)
+            throw new Error('background isn\'t set yet');
+        if (this.currentSlide.params.number === 0) {
+            this.background.DOMNode.classList.remove(this.background.selectorActive);
+        }
+        else {
+            this.background.DOMNode.classList.add(this.background.selectorActive);
+        }
     }
     checkController() {
         if (!this.currentSlide.next) {
-            this.controllers[0].disable();
+            this.controllers[0].isActive = false;
+            this.controllers[0].invertState();
         }
         else {
-            this.controllers[0].enable();
+            this.controllers[0].isActive = true;
+            this.controllers[0].invertState();
         }
     }
 }
-const pageSlider = new PageSlider('.pageContainer', '.sliderBtn', '.sliderBtn--disabled', true);
+const pageSlider = new PageSlider('.pageContainer', '.sliderBtn', '.sliderBtn--active', true);
 pageSlider.init('.page');
+pageSlider.setBackground('.background', '.background--main');
 console.log(pageSlider);
 pageSlider.controllers[0].DOMNode.addEventListener('click', () => {
     pageSlider.toNext();
+    pageSlider.checkBackground();
+    navPublisher.setState(navPublisher.observers[pageSlider.currentSlide.params.number].DOMNode);
+});
+window.addEventListener('resize', () => {
+    pageSlider.fixPosition();
 });
 class NavController extends Controller {
     update(activeController) {
         if (activeController) {
             if (activeController === this) {
-                pageSlider.jumpTo((navPusblisher.observers.indexOf(activeController)));
+                pageSlider.jumpTo((navPublisher.observers.indexOf(activeController)));
+                this.isActive = true;
+                this.invertState();
                 return;
             }
+            this.isActive = false;
+            this.invertState();
         }
     }
 }
@@ -244,14 +289,6 @@ class Publisher {
             controller.update(this.state);
         }
     }
-}
-class NavPusblisher extends Publisher {
-    init(CSSControllerSelector, CSSDisabledSelector) {
-        const controllers = document.querySelectorAll(CSSControllerSelector);
-        for (let controller of controllers) {
-            this.attach(new NavController(controller, CSSDisabledSelector));
-        }
-    }
     setState(node) {
         for (let observer of this.observers) {
             if (observer.DOMNode === node) {
@@ -262,23 +299,73 @@ class NavPusblisher extends Publisher {
         }
     }
 }
-const navPusblisher = new NavPusblisher();
-navPusblisher.attach(new NavController(document.querySelector('.logo__title'), ''));
-navPusblisher.init('.menu__link', '.menu__link--active');
-console.log(navPusblisher);
-document.querySelector('.header').addEventListener('click', e => {
-    console.log(e.target);
-    for (let i = 0; i < navPusblisher.observers.length; i++) {
-        if (e.target === navPusblisher.observers[i].DOMNode) {
-            console.log(navPusblisher.observers[i].DOMNode);
-            navPusblisher.setState(e.target);
-            return;
-        }
+function attachGroup(publisher, subscriberClass, CSSSubscriberSelector, CSSSubscriberSelectorActive) {
+    const subscribers = [...document.querySelectorAll(CSSSubscriberSelector)];
+    for (let subscriber of subscribers) {
+        publisher.attach(new subscriberClass(subscriber, CSSSubscriberSelectorActive, subscriber.classList.contains(CSSSubscriberSelectorActive)));
     }
+}
+const navPublisher = new Publisher();
+navPublisher.attach(new NavController(document.querySelector('.logo__title'), '.placeholder', false));
+attachGroup(navPublisher, NavController, '.menu__link', '.menu__link--active');
+console.log(navPublisher);
+document.querySelector('.header').addEventListener('click', e => {
+    navPublisher.setState(e.target);
 });
 document.querySelector('.logo__img').addEventListener('click', () => {
     pageSlider.track.removeAttribute('style');
     pageSlider.currentSlide = pageSlider.head;
+});
+class ControlledEl extends Controller {
+}
+class QAController extends Controller {
+    constructor() {
+        super(...arguments);
+        this.controlledElement = null;
+    }
+    bindContent(contentNode, CSSContentSelectorActive) {
+        this.controlledElement = new ControlledEl(contentNode, CSSContentSelectorActive, contentNode.classList.contains(CSSContentSelectorActive));
+    }
+    invertState() {
+        if (this.isActive) {
+            this.DOMNode.classList.add(this.activeSelector);
+        }
+        else {
+            this.DOMNode.classList.remove(this.activeSelector);
+        }
+    }
+    update(activeController) {
+        if (activeController === this) {
+            if (this.isActive) {
+                this.isActive = false;
+                this.controlledElement.isActive = false;
+            }
+            else {
+                this.isActive = true;
+                this.controlledElement.isActive = true;
+            }
+            this.invertState();
+            this.controlledElement.invertState();
+            return;
+        }
+        this.controlledElement.isActive = false;
+        this.isActive = false;
+        this.invertState();
+        this.controlledElement.invertState();
+    }
+}
+const qaPublisher = new Publisher();
+attachGroup(qaPublisher, QAController, '.question__controller', '.question__controller--active');
+function bindGroup(publisher, CSSContentSelector, CSSContentSelectorActive) {
+    const group = document.querySelectorAll(CSSContentSelector);
+    for (let i = 0; i < group.length; i++) {
+        publisher.observers[i].bindContent(group[i], CSSContentSelectorActive);
+    }
+}
+bindGroup(qaPublisher, '.question__answer', '.question__answer--active');
+console.log(qaPublisher);
+document.querySelector('.qa__wrapper').addEventListener('click', e => {
+    qaPublisher.setState(e.target);
 });
 
 //# sourceMappingURL=app.js.map
