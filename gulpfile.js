@@ -25,26 +25,19 @@ function compileSass() {
             .pipe(dest('dist/styles'))
 }
 
+const tscProject = tsc.createProject('./tsconfig.json')
+
 function compileTS() {
     return src('./src/app/**.ts')
             .pipe(sourcemap.init())
             .pipe(tsc({
-                outFile: 'app.js',
-                target: 'ES6',
-                removeComments: true
+                target: 'es6',
+                removeComments: true,
+                strictNullChecks: false
             }))
-            // .pipe(concat('app.js'))
             .pipe(sourcemap.write('.'))
             .pipe(dest('./dist/app'))
 }
-
-// function createJSBundle() {
-//     return src('./src/app/**.js')
-//             .pipe(sourcemap.init())
-//                 .pipe(concat('app.js'))
-//             .pipe(sourcemap.write('.'))
-//             .pipe(dest('./dist/app'))
-// }
 
 function runServer() {
     sync.init({
