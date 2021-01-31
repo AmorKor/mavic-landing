@@ -1,4 +1,4 @@
-var _a, _b;
+var _a, _b, _c, _d, _e, _f, _g;
 const compose = (...fns) => (arg) => fns.reduceRight((acc, fn) => fn(acc), arg);
 const pipe = (...fns) => (arg) => fns.reduce((acc, fn) => fn(acc), arg);
 const withConstructor = (constructor) => (obj) => (Object.assign({ __proto__: {
@@ -22,7 +22,7 @@ const LinkedList = (nodes) => (props) => {
 };
 const Controller = ({ node, activeSel }) => (props) => {
     let isEnabled = node.classList.contains(activeSel) ? true : false;
-    return Object.assign(Object.assign({}, props), { getElement: () => node, getState: () => isEnabled ? 'active' : 'disabled', renderState: (isActive) => {
+    return Object.assign(Object.assign({}, props), { getElement: () => node, getState: () => isEnabled, renderState: (isActive) => {
             if (isActive) {
                 node.classList.add(activeSel);
             }
@@ -32,128 +32,216 @@ const Controller = ({ node, activeSel }) => (props) => {
             isEnabled = isActive;
         } });
 };
-const Transformer = ({ node, acts }) => (porps) => {
-    let actions = [...acts];
-    return Object.assign(Object.assign({}, porps), { render() {
-            node.style.transform = actions.join('');
-            return node;
-        }, getElement: () => node, setActions(...acts) { return actions = [...acts]; } });
+const Transformer = ({ node, action, value }) => (porps) => (Object.assign(Object.assign({}, porps), { render() {
+        node.style.transform = `${action}(${value})`;
+        return node;
+    }, getElement: () => node, setAction: (act) => (action = act), setValue: (val) => (value = val) }));
+const ObserverList = (observers) => {
+    const _list = observers ? observers : [];
+    return {
+        attach: (obs) => _list.push(obs),
+        detach: (obs) => _list.splice(_list.indexOf(obs), 1),
+        getList: () => _list
+    };
 };
-const Pointers = ({ nodes, activeSel }) => (props) => {
-    const collection = [...nodes].map((node) => (Controller({ node, activeSel })({})));
-    let prev = null;
-    return Object.assign(Object.assign({}, props), { getControllers: () => collection, renderState(index) {
-            collection.forEach((controller, i) => {
-                if (index === i) {
-                    controller.renderState(true);
-                    if (prev) {
-                        prev.renderState(false);
-                    }
-                    prev = controller;
-                }
-            });
-        } });
+const Publisher = (list) => {
+    let _observers = list ? list : ObserverList();
+    return {
+        subscribe: (obs) => _observers.attach(obs),
+        unsubscribe: (obs) => _observers.detach(obs),
+        notify: (data) => _observers.getList().forEach((obs) => obs.update(data))
+    };
 };
-const Slider = ({ pages, track, prevBtn, nextBtn, pointers, isVertical, }) => ({ prevActive, nextActive, pointerActive, }) => pipe(withConstructor(Slider))({
-    pages: LinkedList(pages)({}),
-    track: Transformer({ node: track, acts: [''] })({}),
-    prevBtn: prevBtn ? Controller({ node: prevBtn, activeSel: prevActive })({}) : null,
-    nextBtn: nextBtn ? Controller({ node: nextBtn, activeSel: nextActive })({}) : null,
-    pointers: pointers ? Pointers({ nodes: pointers, activeSel: pointerActive })({}) : null,
-    currentSlide: 1,
-    moveTo(slideNum) {
-        var _a, _b, _c, _d, _e, _f;
-        let page;
-        if (slideNum === this.currentSlide + 1) {
-            page = this.pages.toNext();
-        }
-        else if (slideNum === this.currentSlide - 1) {
-            page = this.pages.toPrev();
-        }
-        else {
-            page = this.pages.setCurrent(slideNum - 1);
-        }
-        if (!page)
-            return;
-        let multiplier = slideNum - 1;
-        if (this.currentSlide === this.pages.getNodes().length ||
-            this.currentSlide > slideNum) {
-            multiplier = this.currentSlide - (this.currentSlide - slideNum + 1);
-        }
-        this.track.setActions(isVertical ?
-            `translateY(-${page.element.clientHeight * multiplier}px)` :
-            `translateX(-${page.element.clientWidth * multiplier}px)`);
-        this.track.render();
-        if (!page.next) {
-            (_a = this.nextBtn) === null || _a === void 0 ? void 0 : _a.renderState(false);
-            (_b = this.prevBtn) === null || _b === void 0 ? void 0 : _b.renderState(true);
-        }
-        else if (!page.prev) {
-            (_c = this.prevBtn) === null || _c === void 0 ? void 0 : _c.renderState(false);
-            (_d = this.nextBtn) === null || _d === void 0 ? void 0 : _d.renderState(true);
-        }
-        else {
-            (_e = this.nextBtn) === null || _e === void 0 ? void 0 : _e.renderState(true);
-            (_f = this.prevBtn) === null || _f === void 0 ? void 0 : _f.renderState(true);
-        }
-        if (pointers) {
-            this.pointers.renderState(slideNum - 1);
-        }
-        this.currentSlide = slideNum;
-        return page;
-    }
-});
-const imgSlider = Slider({
-    pages: document.querySelectorAll('.slider__img'),
-    track: document.querySelector('.slider__inner'),
-    prevBtn: document.querySelector('.controller--left'),
-    nextBtn: document.querySelector('.controller--right'),
-})({
-    prevActive: 'controller--active',
-    nextActive: 'controller--active'
-});
-const pageSlider = Slider({
-    pages: document.querySelectorAll('.page'),
-    track: document.querySelector('.pageContainer'),
-    nextBtn: document.querySelector('.sliderBtn'),
-    pointers: document.querySelectorAll('.menu__link'),
-    isVertical: true,
-})({
-    nextActive: 'sliderBtn--active',
-    pointerActive: 'menu__link--active',
-});
-const background = Controller({
-    node: document.querySelector('.background'),
-    activeSel: 'background--main'
-})({});
-console.log(imgSlider);
-console.log(pageSlider);
-(_a = document.querySelector('.buttonContainer')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', (e) => {
-    var _a;
-    if (e.target === ((_a = imgSlider.prevBtn) === null || _a === void 0 ? void 0 : _a.getElement())) {
-        imgSlider.moveTo(imgSlider.currentSlide - 1);
-    }
-    else {
-        imgSlider.moveTo(imgSlider.currentSlide + 1);
-    }
-});
-pageSlider.nextBtn.getElement().addEventListener('click', () => {
-    pageSlider.moveTo(pageSlider.currentSlide + 1);
-    background.renderState(true);
-});
-(_b = document.querySelector('.header')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', (e) => {
-    var _a;
-    (_a = pageSlider.pointers) === null || _a === void 0 ? void 0 : _a.getControllers().forEach((pointer, i) => {
-        if (e.target === pointer.getElement()) {
-            pageSlider.moveTo(i + 1);
-            if (pageSlider.currentSlide > 1) {
-                background.renderState(true);
+const PointerObserver = (pointer) => {
+    const _pointer = pointer;
+    return {
+        update(data) {
+            if (data === _pointer.getElement()) {
+                _pointer.renderState(true);
             }
             else {
-                background.renderState(false);
+                _pointer.renderState(false);
             }
         }
+    };
+};
+const TransformerObserver = (transformer) => {
+    const _transformer = transformer;
+    return {
+        update(data) {
+            _transformer.setValue(`-${data.value * data.index}px`);
+            _transformer.render();
+        }
+    };
+};
+const menu = {
+    button: Controller({
+        node: document.querySelector('.burger'),
+        activeSel: 'burger--active'
+    })({}),
+    nav: Controller({
+        node: document.querySelector('.menu'),
+        activeSel: 'menu--active'
+    })({})
+};
+(_a = document.querySelector('.burger')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+    if (!menu.nav.getState()) {
+        menu.button.renderState(true);
+        menu.nav.renderState(true);
+    }
+    else {
+        menu.button.renderState(false);
+        menu.nav.renderState(false);
+    }
+});
+const imgSlider = {
+    pages: LinkedList(document.querySelectorAll('.slider__img'))({}),
+    track: TransformerObserver(Transformer({
+        node: document.querySelector('.slider__inner'),
+        action: 'translateX'
+    })({})),
+    nextButton: Controller({
+        node: document.querySelector('.controller--right'),
+        activeSel: 'controller--active'
+    })({}),
+    prevButton: Controller({
+        node: document.querySelector('.controller--left'),
+        activeSel: 'controller--active'
+    })({}),
+    checkButtons: function () {
+        const current = this.pages.getCurrent();
+        if (!(current === null || current === void 0 ? void 0 : current.prev)) {
+            this.prevButton.renderState(false);
+        }
+        else if (!(current === null || current === void 0 ? void 0 : current.next)) {
+            this.nextButton.renderState(false);
+        }
+        else {
+            this.prevButton.renderState(true);
+            this.nextButton.renderState(true);
+        }
+    }
+};
+(_b = document.querySelector('.controller--right')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', debounce(e => {
+    const current = imgSlider.pages.toNext();
+    imgSlider.track.update({
+        value: current === null || current === void 0 ? void 0 : current.element.clientWidth,
+        index: imgSlider.pages.getNodes().indexOf(current)
     });
+    imgSlider.checkButtons();
+}, 300, true));
+(_c = document.querySelector('.controller--left')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', debounce(e => {
+    const current = imgSlider.pages.toPrev();
+    imgSlider.track.update({
+        value: current === null || current === void 0 ? void 0 : current.element.clientWidth,
+        index: imgSlider.pages.getNodes().indexOf(current)
+    });
+    imgSlider.checkButtons();
+}, 300, true));
+const pageSlider = {
+    pages: LinkedList(document.querySelectorAll('.page'))({}),
+    track: TransformerObserver(Transformer({
+        node: document.querySelector('.body__inner'),
+        action: 'translateY'
+    })({})),
+    nextButton: Controller({
+        node: document.querySelector('.sliderBtn'),
+        activeSel: 'sliderBtn--active'
+    })({}),
+    pointers: ObserverList([...document.querySelectorAll('.pointer')]
+        .map((el) => Controller({
+        node: el,
+        activeSel: 'menu__link--active'
+    })({}))
+        .map(PointerObserver)),
+    background: Controller({
+        node: document.querySelector('.background'),
+        activeSel: 'background--main'
+    })({}),
+    checkButton: function () {
+        const current = this.pages.getCurrent();
+        if (!current.next) {
+            this.nextButton.renderState(false);
+        }
+        else {
+            this.nextButton.renderState(true);
+        }
+    },
+    checkBackground: function () {
+        const current = this.pages.getCurrent();
+        if (!current.prev) {
+            this.background.renderState(false);
+        }
+        else {
+            this.background.renderState(true);
+        }
+    }
+};
+const linkPublisher = Publisher(pageSlider.pointers);
+const links = [...document.querySelectorAll('.pointer')];
+(_d = document.querySelector('.sliderBtn')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', debounce(e => {
+    const current = pageSlider.pages.toNext();
+    const index = pageSlider.pages.getNodes().indexOf(current);
+    pageSlider.track.update({
+        value: current === null || current === void 0 ? void 0 : current.element.clientHeight,
+        index: index
+    });
+    linkPublisher.notify(links[index]);
+    pageSlider.checkButton();
+    pageSlider.checkBackground();
+}, 300, true));
+(_e = document.querySelector('.header')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', debounce(e => {
+    const current = pageSlider.pages.setCurrent(links.indexOf(e.target));
+    pageSlider.track.update({
+        value: current.element.clientHeight,
+        index: pageSlider.pages.getNodes().indexOf(current)
+    });
+    linkPublisher.notify(e.target);
+    pageSlider.checkButton();
+    pageSlider.checkBackground();
+}, 300, true));
+const answers = ObserverList([...document.querySelectorAll('.question__answer')].map(a => {
+    return PointerObserver(Controller({
+        node: a,
+        activeSel: 'question__answer--active'
+    })({}));
+}));
+const qaButtons = ObserverList([...document.querySelectorAll('.question__controller')].map(c => {
+    return PointerObserver(Controller({
+        node: c,
+        activeSel: 'question__controller--active'
+    })({}));
+}));
+const answerPublisher = Publisher(answers);
+const qaButtonPublisher = Publisher(qaButtons);
+(_f = document.querySelector('.qa__wrapper')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', e => {
+    qaButtonPublisher.notify(e.target);
+});
+function debounce(fn, wait, immediate) {
+    let timeout;
+    return function deffered(...args) {
+        const context = this;
+        const callNow = immediate && !timeout;
+        const invoke = () => {
+            timeout = undefined;
+            if (!immediate)
+                fn.apply(context, args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(invoke, wait);
+        if (callNow)
+            fn.apply(context, args);
+    };
+}
+window.addEventListener('resize', debounce(() => {
+    const current = pageSlider.pages.getCurrent();
+    pageSlider.track.update({
+        value: current.element.clientHeight,
+        index: pageSlider.pages.getNodes().indexOf(current)
+    });
+}, 200));
+(_g = document.querySelector('.pageContainer')) === null || _g === void 0 ? void 0 : _g.addEventListener('scroll', () => {
+    console.log('scrolled');
 });
 
 //# sourceMappingURL=main.js.map

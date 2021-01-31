@@ -12,28 +12,32 @@
   <body class="body">
     <div class="background"></div>
     <header class="header">
-      <div class="logo smallContainer"><img class="logo__img" src="img/dji_logo_gray 1.png" alt="logo">
-        <p class="logo__title menu__link">mavic 2 pro</p>
+      <div class="logo"><img class="logo__img pointer" src="img/dji_logo_gray 1.png" alt="logo">
+        <p class="logo__title">mavic 2 pro</p>
+      </div>
+      <div class="header__container">
+        <button class="button button__header">Купить</button><a class="tel header__tel" href="tel:+8-050-567-67-67">8 (050) 567 67 67</a>
       </div>
       <nav class="menu">
         <ul class="list menu__list">
-          <li class="menu__item"><a class="menu__link" href="#">О дроне</a></li>
-          <li class="menu__item"><a class="menu__link" href="#">Преимущества</a></li>
-          <li class="menu__item"><a class="menu__link" href="#">Характеристики</a></li>
-          <li class="menu__item"><a class="menu__link" href="#">Вопросы</a></li>
-          <li class="menu__item"><a class="menu__link" href="#">Контакты</a></li>
+          <li class="menu__item"><a class="menu__link pointer" href="#">О дроне</a></li>
+          <li class="menu__item"><a class="menu__link pointer" href="#">Преимущества</a></li>
+          <li class="menu__item"><a class="menu__link pointer" href="#">Характеристики</a></li>
+          <li class="menu__item"><a class="menu__link pointer" href="#">Вопросы</a></li>
+          <li class="menu__item"><a class="menu__link pointer" href="#">Контакты</a></li>
+          <div class="menu__line"></div><a class="tel menu__tel" href="tel:+8-050-567-67-67">8 (050) 567 67 67</a>
         </ul>
       </nav>
-      <div class="smallContainer">
-        <button class="button button--header">Купить</button><a class="tel" href="tel:+8-050-567-67-67">8 (050) 567 67 67</a>
-      </div>
+      <div class="burger"></div>
     </header>
-    <main class="pageContainer">
+    <main class="body__inner">
       <div class="page">
         <div class="hero page__hero">  
-          <h1 class="hero__title">Mavic 2 Pro</h1><img class="hero__img" src="img/drone.png" alt="Mavic drone">
-          <p class="hero__desc">Квадрокоптер Dji Mavic 2 Pro с профессиональной камерой Hasselblad</p>
-          <ul class="socials">
+          <div class="hero__content">
+            <h1 class="hero__title">Mavic 2 Pro</h1><img class="hero__img" srcset="img/drone_360px.png 360w, img/drone.png 660w" sizes="(max-width: 360px) 360px, (min-width: 560px) 660px" src="img/drone.png" alt="Mavic drone">
+            <p class="hero__desc">Квадрокоптер Dji Mavic 2 Pro с профессиональной камерой Hasselblad</p>
+          </div>
+          <ul class="socials hero__socials">
             <li class="socials__item"><a class="socials__link" href="#"><img src="img/icons/fb.png" alt="fb"></a></li>
             <li class="socials__item"><a class="socials__link" href="#"><img src="img/icons/yt.png" alt="yt"></a></li>
             <li class="socials__item"><a class="socials__link" href="#"><img src="img/icons/ins.png" alt="ins"></a></li>
@@ -68,7 +72,7 @@
         </div>
       </div>
       <div class="page page--main"> 
-        <h2 class="title page__title">Преимущества</h2>
+        <h2 class="title page__title title__advantages">Преимущества</h2>
         <div class="cards page__cards">
           <div class="cards__guidelines"></div>
           <div class="cards__wrapper">
@@ -119,10 +123,12 @@
         </div>
       </div>
       <div class="page page--main"> 
-        <h2 class="title page__title">Характеристики</h2>
+        <h2 class="title page__title page__title--specs">Характеристики</h2>
         <div class="specs page__specs">
-          <div class="specs__background"></div>
           <div class="specs__wrapper">
+            <div class="specs__background"><img class="specs__img" src="img/drone.png" alt="Mavic drone">
+              <div class="specs__guidelines"></div>
+            </div>
             <div class="textContainer specs__textContainer">
               <h4 class="title title--s specs__title">Dlog-M 10 бит</h4>
               <p class="text specs__text">Mavic 2 Pro поддерживает цветовой профиль Dlog-M 10 бит с более широким динамическим диапазоном, дающим больше возможностей для цветокоррекции.</p>
@@ -143,42 +149,46 @@
         </div>
       </div>
       <div class="page page--main"> 
-        <h2 class="title page__title">Остались вопросы?</h2>
+        <h2 class="title page__title page__title--qa">Остались вопросы?</h2>
         <div class="qa page__qa">
           <div class="qa__wrapper">
-            <div class="question qa__question">
-              <p class="question__inner"> <span class="question__text">Какие отличия между Mavic 2 Pro и Mavic 2 Zoom?</span><span class="question__answer text">
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
-                  Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
-                  necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?</span></p>
+            <div class="question qa__question">Какие отличия между Mavic 2 Pro и Mavic 2 Zoom?
+              <div class="question__answer text question__answer--active">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
+                Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
+                necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?
+              </div>
               <button class="controller question__controller"></button>
             </div>
-            <div class="question qa__question">
-              <p class="question__inner"> <span class="question__text">Чем Mavic 2 лучше Mavic Pro?  </span><span class="question__answer text">
-                  В Mavic 2 улучшены практически все аспекты: камера, передача видеосигнала, полётное время, 
-                  скорость, уровень шума, обнаружение препятствий в нескольких направлениях, интеллектуальные функции 
-                  и уникальная функция Hyperlapse (гиперлапс).</span></p>
+            <div class="question qa__question"> Чем Mavic 2 лучше Mavic Pro?  
+              <div class="question__answer text">
+                В Mavic 2 улучшены практически все аспекты: камера, передача видеосигнала, полётное время, 
+                скорость, уровень шума, обнаружение препятствий в нескольких направлениях, интеллектуальные функции 
+                и уникальная функция Hyperlapse (гиперлапс).
+              </div>
               <button class="controller question__controller"></button>
             </div>
-            <div class="question qa__question">
-              <p class="question__inner"> <span class="question__text">Можно ли подключить Mavic 2 к очкам DJI Goggles?</span><span class="question__answer text">
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
-                  Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
-                  necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?</span></p>
+            <div class="question qa__question">Можно ли подключить Mavic 2 к очкам DJI Goggles?
+              <div class="question__answer text">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
+                Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
+                necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?
+              </div>
               <button class="controller question__controller"></button>
             </div>
-            <div class="question qa__question">
-              <p class="question__inner"> <span class="question__text">Является ли Mavic 2 водонепроницаемым？</span><span class="question__answer text">
-                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
-                  Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
-                  necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?</span></p>
+            <div class="question qa__question">Является ли Mavic 2 водонепроницаемым？
+              <div class="question__answer text">
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. 
+                Ipsa, eaque. Error sequi dolores illum, repellendus illo magni quod quibusdam tenetur sapiente vero quam
+                necessitatibus blanditiis deserunt quisquam laboriosam saepe perferendis?
+              </div>
               <button class="controller question__controller"></button>
             </div>
           </div><img class="qa__img" src="img/bg/qa_drone.png">
         </div>
       </div>
       <div class="page page--main"> 
-        <h1 class="title page__title">Контакты</h1>
+        <h1 class="title page__title page__title--contacts">Контакты</h1>
         <div class="content page__content"> 
           <div class="contacts content__contacts">
             <div class="contacts__card">
