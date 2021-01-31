@@ -4,105 +4,164 @@
     align-self: end;
 }
 
-.description,
-.page__presentation {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-}
-
-.page__description {
-    grid-template-rows: 70px 265px;
+.description {
+    display: flex;
+    flex-flow: column nowrap;
     row-gap: 30px;
-
-    max-width: 440px
 }
 
-@media(max-height: get-height($m-screen-s)) {
-    .page__description {
-        grid-template-rows: 100px;
-        
-        max-width: 400px;
-    }
-}
-
-// MAIN TEXT
 .description__text {
     max-width: 440px;
 }
 
-.description__text:first-child {
-    margin-bottom: 1.75em;
+@media(max-width: 531px) {
+    .page__title {
+        font-size: 4rem;
+    }
 }
 
-// PRESENTATION
-.presentation {
-    min-width: 825px;
-    height: 365px;
-    position: relative;
+@media (max-width: 490px) {
+    .page__title {
+        font-size: 2.75rem;
+    }
 }
 
-.presentation__title {
-    margin-bottom: 90px;
+@media(max-width: 500px) {
+    .description {
+        grid-column: 2 / 4;
+    }
+
+    .page__presentation {
+        display: none;
+    }
 }
 
-.page__presentation {
-    justify-self: end;
-    align-self: end;
-    margin-right: 30px;
+@media(min-width: 501px) {
+    .description,
+    .page__presentation {
+        grid-column: 3 / 4;
+        grid-row: 2 / 3;
+    }
 }
 
-.presentation__title {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 290px;
-    text-align: right;
-    z-index: 1;
+@media(max-width: 1015px) {    
+    .page__description,
+    .page__title {
+        justify-self: center;
+    }
+    
+    .page__presentation {
+        display: none;
+    }
 }
 
-.slider {
-    display: flex;
-    flex-flow: column nowrap;
-    width: 560px;
-    position: absolute;
-    top: 0;
-    right: 0;
+@media(min-width: 980px) {
+    .presentation {
+        min-width: 825px;
+        height: 365px;
+        position: relative;
+    }
+    
+    .presentation__title {
+        margin-bottom: 90px;
+    }
+    
+    .page__presentation {
+        justify-self: end;
+        align-self: end;
+        margin-right: 30px;
+    }
+    
+    .presentation__title {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 290px;
+        text-align: right;
+        z-index: 1;
+    }
+    
+    .slider {
+        display: flex;
+        flex-flow: column nowrap;
+        width: 560px;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    
+    .presention__slider {
+        margin-top: 15px;
+        margin-right: 15px;
+    }
+    
+    .slider__border {
+        width: 565px;
+        height: 280px;
+        position: absolute;
+        // top: 0;
+        right: 0;
+        border: 4px solid #fff;
+    }
+    
+    .buttonContainer {
+        align-self: flex-end;
+        display: flex;
+        flex-flow: row nowrap;
+    }
+    
+    .slider__wrapper {
+        overflow: hidden;
+    }
+    
+    .slider__inner {
+        display: flex;
+        flex-flow: row nowrap;
+        width: max-content;
+    
+        transition: transform 300ms ease-in-out;
+    }
+    
+    .slider__img {
+        display: block;
+    }    
 }
 
-.presention__slider {
-    margin-top: 15px;
-    margin-right: 15px;
+@media(min-width: 980px) and (max-width: 1140px) {
+    .page__description {
+        flex-flow: row-reverse nowrap;
+        justify-content: space-between;
 
+        max-width: 100%;
+    }
+
+    .buttonContainer {
+        order: -1;
+    }
+
+    .presentation__title {
+        margin-bottom: 45px;
+    }
+
+    .presention__slider {
+        margin: 0 15px 15px 0;
+    }
+    
+    .slider__border {
+        bottom: 0;
+        right: 0;
+    }
 }
 
-.slider__border {
-    width: 565px;
-    height: 280px;
-    position: absolute;
-    top: 0;
-    right: 0;
-    border: 4px solid #fff;
+@media(max-height: 720px) {
+    .description {
+        row-gap: 15px;
+    }
 }
 
-.buttonContainer {
-    align-self: flex-end;
-    display: flex;
-    flex-flow: row nowrap;
-}
-
-.slider__wrapper {
-    overflow: hidden;
-}
-
-.slider__inner {
-    display: flex;
-    flex-flow: row nowrap;
-    width: max-content;
-
-    transition: transform 300ms ease-in-out;
-}
-
-.slider__img {
-    display: block;
+@media(max-width: 320px) {
+    .description__text {
+        font-size: 15px;
+    }
 }
 

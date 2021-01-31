@@ -8,34 +8,36 @@
     align-items: center
 }
 
-
-// MAIN CONTAINER LAYOUT
-
-.pageContainer {
-    width: calc(100vw - 60px);
+.body__inner {
+    width: 100%;
     
-    display: grid;
-    grid-auto-rows: 100vh;
-    place-items: center;
     z-index: 1;
 
     transition: transform 500ms ease-in-out;
 }
 
+@media (min-width: 361px) {
+    .body__inner {
+        max-width: 1270px;
+    }
+}
+
 .page {
     height: 100vh;
     padding-bottom: 90px;
-    max-width: 1270px;
-    width: calc(100vw - 60px);
 
-    // for ems
-    font-size: 10px;
+    z-index: 1;
 
     display: grid;
     grid-template-columns: 25px 30px 1fr;
     grid-template-rows: 155px 1fr;
 }
 
+@media (max-width: 760px) {
+    .page {
+        padding-bottom: 75px;
+    }
+}
 
 
 @media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {

@@ -19,15 +19,9 @@
 }
 
 .content__contacts {
-    // margin-right: 8.5em;
     margin-right: calc((100% + 25px) * 0.066);
 
 }
-
-// @media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
-//     .content__contacts {
-//     }
-// }
 
 .contacts__card {
     display: flex;
@@ -47,17 +41,9 @@
     text-decoration: underline;
 }
 
-// // INPUT FIELDS
-// @media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
-//     .content__form {
-//     }
-// }
-
 .content__form {
     margin-right: calc((100% + 25px) * 0.083);
-    // width: max-content;
     height: min-content;
-    // margin-right: 10.5em;
 
     flex: 0 1 570px;
 }
@@ -133,3 +119,118 @@
 .content__socials.socials--vertical {
     margin-top: 8.5em;
 }
+
+@media(max-width: 320px) {
+    .content__socials.socials--vertical {
+        flex-flow: row nowrap;
+        column-gap: 30px;
+
+        margin-top: 0;
+    }
+}
+
+@media(max-width: 855px) {
+    .page__title--contacts {
+        display: none;
+    }
+
+    .contacts {
+        display: none;
+    }
+
+    .page__content {
+        margin-top: 50px;
+    }
+    
+    .content__form {
+        margin-right: 0;
+
+        width: 90%;
+    }
+    
+    .form__inner {
+        display: flex;
+        flex-flow: column nowrap;
+    }
+    
+    .form__text {
+        display: none;
+    }
+    
+    .form__inputs {
+        flex-flow: column nowrap;
+
+        min-width: 300px;
+    }
+    
+    .form__input:first-child {
+        margin-right: 0;
+    }    
+    
+    .form__button {
+        justify-self: flex-end;
+    }
+    
+    .page__content {
+        grid-row: 1 / 4;
+        grid-column: 1 / 4;
+        
+        align-items: center;
+        flex-flow: column nowrap;
+    }
+
+    .content__form {
+        flex: 0 1 auto;
+    }
+    
+    .socials {
+        display: none;
+    }
+    
+    .socials--vertical {    
+        .socials__item:not(:last-child) {
+            margin-bottom: 0;
+        }
+    }    
+}
+
+@media(min-width: 321px) and (max-width: 855px) {
+    .socials {
+        display: flex;
+    }
+    
+    .content__socials.socials--vertical {
+        flex-flow: row nowrap;
+        column-gap: 30px;
+
+        margin-top: 50px;
+    }
+}
+
+@media(min-width: 856px) and (max-width: 980px) {
+    .content__form {
+        margin-right: 0;
+    }
+
+    .content__socials {
+        display: none;
+    }
+}
+
+@media(min-width: 856px) and (max-width: 1280px) {
+    .page__content {
+        grid-column: 1 / 4;
+        justify-self: center;
+        
+        flex-flow: row nowrap;
+        justify-content: center;
+        
+        width: 90%;
+    }
+    
+    .content__contacts {
+        margin-right: 25px;
+    }
+}
+
+// @media(min-width: )

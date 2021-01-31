@@ -1,13 +1,16 @@
 header.header
-    .logo.smallContainer
-        img.logo__img(src="img/dji_logo_gray 1.png", alt="logo")
-        p.logo__title.menu__link mavic 2 pro
+    .logo
+        img.logo__img.pointer(src="img/dji_logo_gray 1.png", alt="logo")
+        p.logo__title mavic 2 pro
+    .header__container
+        button.button.button__header Купить
+        a.tel.header__tel(href="tel:+8-050-567-67-67") 8 (050) 567 67 67
     nav.menu
         ul.list.menu__list
             - const menuList = ["О дроне", "Преимущества", "Характеристики", "Вопросы", "Контакты"]
             for item in menuList
                 li.menu__item
-                    a.menu__link(href='#')= item
-    .smallContainer
-        button.button.button--header Купить
-        a.tel(href="tel:+8-050-567-67-67") 8 (050) 567 67 67
+                    a.menu__link.pointer(href='#')= item
+            .menu__line
+            a.tel.menu__tel(href="tel:+8-050-567-67-67") 8 (050) 567 67 67
+    .burger

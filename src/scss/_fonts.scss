@@ -73,12 +73,6 @@ a {
     font-size: 4.4em;
 }
 
-@media(max-height: get-height($m-screen-s)) {
-    .title {
-        font-size: 36px;
-    }
-}
-
 .text {
     @include text-m;
 }

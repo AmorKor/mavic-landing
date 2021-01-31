@@ -31,7 +31,7 @@ function compileTS() {
     return src('./src/app/**.ts')
             .pipe(sourcemap.init())
             .pipe(tsc({
-                target: 'es6',
+                target: 'es2016',
                 removeComments: true,
                 strictNullChecks: false
             }))

@@ -23,7 +23,8 @@ interface IController {
 
 interface ITransformer {    
     getElement: () => Element
-    setActions(...acts: string[]): string[]
+    setAction(action: string): string
+    setValue(value: string): string
     render(): Element
 }
 
@@ -32,15 +33,20 @@ interface IPointers {
     renderState(index: number): void
 }
 
-interface ISlider {
-    pages: ILinkedList
-    track: ITransformer
-    prevBtn?: IController
-    nextBtn: IController
-    pointers: IPointers
-    currentSlide: number
-    
-    moveTo(slideNum: number): INode | undefined
+interface IPublisher {
+    subscribe(obs: IObserver): number
+    unsubscribe(obs: IObserver): IObserver[]
+    notify(data?: any): void
+}
+
+interface IObserverList {
+    attach(obs: IObserver): number
+    detach(obs: IObserver): IObserver[]
+    getList(): IObserver[]
+}
+
+interface IObserver {
+    update(data: any): void
 }
 
 const compose = (...fns: any[]) => (arg: any) => 
@@ -105,7 +111,7 @@ const Controller: ControllerFactory = ({node, activeSel}) => (props)=> {
         ...props,
     
         getElement: () => node,
-        getState: () => isEnabled ? 'active' : 'disabled',
+        getState: () => isEnabled,
         
         renderState: (isActive) => {            
             if(isActive) {
@@ -118,212 +124,262 @@ const Controller: ControllerFactory = ({node, activeSel}) => (props)=> {
     }
 }
 
-type TransformerFactory = ({}: {node: HTMLElement, acts: string[]}) => (props: object) => ITransformer
+type TransformerFactory = ({}: {node: HTMLElement, action: string, value: string}) => (props: object) => ITransformer
 
-const Transformer: TransformerFactory = ({node, acts}) => (porps): ITransformer  => {
-    let actions = [...acts]
-    return {
-        ...porps,
-        
-        render() {
-            node.style.transform = actions.join('')
-            return node
-        },
-        getElement: () => node,
-        setActions(...acts: string[]) {return actions = [...acts]},
-    }
-}
-
-type PointersFactory = ({}: {nodes: NodeListOf<Element>, activeSel: string}) => (props: object) => IPointers
-
-const Pointers: PointersFactory = ({nodes, activeSel}) => (props) => {
-    const collection = [...nodes].map((node) => (Controller({node, activeSel})({})))
-    let prev: IController | null = null
+const Transformer: TransformerFactory = ({node, action, value}) => (porps): ITransformer  => ({
+    ...porps,
     
+    render() {
+        node.style.transform = `${action}(${value})`
+        return node
+    },
+    getElement: () => node,
+    setAction: (act) => (action = act),
+    setValue: (val) => (value = val)
+})
+
+type ObserverListFactory = (observers?: IObserver[]) => IObserverList
+
+const ObserverList: ObserverListFactory = (observers) => {
+    const _list: IObserver[] = observers ? observers : []
     return {
-        ...props,
-        
-        getControllers: () => collection,
-        
-        renderState(index) {
-            collection.forEach((controller, i) => {
-                if(index === i) {
-                    controller.renderState(true)
-                    if(prev) {
-                        prev.renderState(false)
-                    }
-                    prev = controller
-                }
-            })
-        }     
+        attach: (obs) => _list.push(obs),
+        detach: (obs) => _list.splice(_list.indexOf(obs), 1),
+        getList: () => _list
     }
 }
 
-type SliderFactory = ({}: {
-    pages: NodeListOf<Element>
-    track: HTMLElement
-    prevBtn?: Element
-    nextBtn?: Element
-    pointers?: NodeListOf<Element>
-    isVertical?: boolean
-}) => ({}: {
-    prevActive?: string
-    nextActive?: string
-    pointerActive?: string
-}) => ISlider
+type PublisherFactory = (observers?: IObserverList) => IPublisher
 
-const Slider: SliderFactory = ({
-    pages,
-    track,
-    prevBtn,
-    nextBtn,
-    pointers,
-    isVertical,
-}) => ({
-    prevActive,
-    nextActive,
-    pointerActive,
-}) => pipe(
-    withConstructor(Slider)
-)({
-    pages: LinkedList(pages)({}),
-    track: Transformer({node: track, acts: ['']})({}),
-    prevBtn: prevBtn ? Controller({node: prevBtn, activeSel: prevActive})({}) : null, 
-    nextBtn: nextBtn ? Controller({node: nextBtn, activeSel: nextActive})({}) : null ,
-    pointers: pointers ? Pointers({nodes: pointers, activeSel: pointerActive})({}) : null,
-    currentSlide: 1,
-
-    moveTo(slideNum) {            
-        let page 
-
-        if(slideNum === this.currentSlide + 1) {
-            page = this.pages.toNext()
-        } else if(slideNum === this.currentSlide - 1) {
-            page = this.pages.toPrev()
-        } else {
-            page = this.pages.setCurrent(slideNum - 1)
-        }
-
-        if(!page) return
-
-        let multiplier = slideNum - 1
-        
-        if(
-            this.currentSlide === this.pages.getNodes().length ||
-            this.currentSlide > slideNum 
-        ) {
-            multiplier = this.currentSlide - (this.currentSlide - slideNum + 1)
-        }
-
-        this.track.setActions(
-            isVertical ?
-            `translateY(-${page.element.clientHeight * multiplier}px)` :
-            `translateX(-${page.element.clientWidth * multiplier}px)` 
-        )
-
-        this.track.render()
-        
-        if(!page.next) {
-            this.nextBtn?.renderState(false)
-            this.prevBtn?.renderState(true)
-        } else if(!page.prev) {
-            this.prevBtn?.renderState(false)
-            this.nextBtn?.renderState(true)
-        } else {
-            this.nextBtn?.renderState(true)
-            this.prevBtn?.renderState(true)
-        }
-        
-        if(pointers) {
-            this.pointers.renderState(slideNum - 1)
-        }
-        
-        this.currentSlide = slideNum
-        
-        return page
+const Publisher: PublisherFactory = (list) => {
+    let _observers = list ? list : ObserverList()
+    return {
+        subscribe: (obs) => _observers.attach(obs),
+        unsubscribe: (obs) => _observers.detach(obs),
+        notify: (data: any) => _observers.getList().forEach((obs: IObserver) => obs.update(data))
     }
-})
+}
 
-const imgSlider = Slider({
-    pages: document.querySelectorAll('.slider__img'),
-    track: document.querySelector('.slider__inner'),
-    prevBtn: document.querySelector('.controller--left'),
-    nextBtn: document.querySelector('.controller--right'),
-})({
-    prevActive: 'controller--active',
-    nextActive: 'controller--active'
-})
+type ObserverFactory<T> = (handler: T) => IObserver
 
-const pageSlider = Slider({
-    pages: document.querySelectorAll('.page'),
-    track: document.querySelector('.pageContainer'),
-    nextBtn: document.querySelector('.sliderBtn'),
-    pointers: document.querySelectorAll('.menu__link'),
-    isVertical: true,
-})({
-    nextActive: 'sliderBtn--active',
-    pointerActive: 'menu__link--active',
-})
-
-const background = Controller({
-    node: document.querySelector('.background'),
-    activeSel: 'background--main' 
-})({})
-
-console.log(imgSlider)
-console.log(pageSlider)
-
-// const Question = ({controller, box, controllerAct, boxAct}: {
-//     controller: Element, box: HTMLElement, controllerAct: string, boxAct: string
-// }) => ({
-//     btn: Controller(controller)(controllerAct),
-//     answer: Transformer(box)(boxAct)
-// });
-
-// // [...document.querySelectorAll('.question__controller')].map(Pointers)
-
-// const question = Question({
-//     controller: document.querySelector('.question__controller'),
-//     box: document.querySelector('.question__answer'),
-//     controllerAct: 'question__controller--active',
-//     boxAct: 'question__answer--active'
-// })
-
-// console.log(question)
-
-// // const qa = Controllers(document.querySelectorAll('.question__controller'))('question__controller--active')
-// const qa = Pointers(document.querySelectorAll('.question__controller'))('question__controller--active')
-
-// document.querySelector('.qa__wrapper')?.addEventListener('click', (e) => {
-//     qa.nodes.forEach((btn, i) => {
-//         if(e.target === btn.node) {
-//             qa.render(i)
-//         }
-//     })
-// })
-
-document.querySelector('.buttonContainer')?.addEventListener('click', (e) => {
-    if(e.target === imgSlider.prevBtn?.getElement()) {
-        imgSlider.moveTo(imgSlider.currentSlide - 1);
-    } else {
-        imgSlider.moveTo(imgSlider.currentSlide + 1)
-    }
-})
-
-pageSlider.nextBtn.getElement().addEventListener('click', () => {
-    pageSlider.moveTo(pageSlider.currentSlide + 1)
-    background.renderState(true)
-})
-
-document.querySelector('.header')?.addEventListener('click', (e) => {
-    pageSlider.pointers?.getControllers().forEach((pointer, i) => {
-        if(e.target === pointer.getElement()) {
-            pageSlider.moveTo(i + 1)        
-            if(pageSlider.currentSlide > 1) {
-                background.renderState(true)   
+const PointerObserver: ObserverFactory<IController> = (pointer) => {
+    const _pointer = pointer
+    return {
+        update(data) {
+            if(data === _pointer.getElement()) {
+                _pointer.renderState(true)
             } else {
-                background.renderState(false)   
+                _pointer.renderState(false)
             }
         }
+    }
+}
+
+const TransformerObserver: ObserverFactory<ITransformer> = (transformer) => {
+    const _transformer = transformer
+    return {
+        update(data: {value: number, index: number}) {
+            _transformer.setValue(`-${data.value * data.index}px`)
+            _transformer.render()
+        }
+    }
+}
+
+const menu = {
+    button: Controller({
+        node: document.querySelector('.burger'),
+        activeSel: 'burger--active'
+    })({}),
+    nav: Controller({
+        node: document.querySelector('.menu'),
+        activeSel: 'menu--active'
+    })({}) 
+}
+
+document.querySelector('.burger')?.addEventListener('click', () => {
+    if(!menu.nav.getState()) {
+        menu.button.renderState(true)
+        menu.nav.renderState(true)
+    } else {
+        menu.button.renderState(false)
+        menu.nav.renderState(false)
+    }
+})
+
+const imgSlider = {
+    pages: LinkedList(document.querySelectorAll('.slider__img'))({}),
+    track: TransformerObserver(Transformer({
+        node: document.querySelector('.slider__inner'),
+        action: 'translateX'
+        })({})
+    ),
+    nextButton: Controller({
+        node: document.querySelector('.controller--right'),
+        activeSel: 'controller--active'}
+        )({}),
+    prevButton: Controller({
+        node: document.querySelector('.controller--left'),
+        activeSel: 'controller--active'}
+        )({}),
+    checkButtons: function() {
+        const current = this.pages.getCurrent()
+
+        if(!current?.prev) {
+            this.prevButton.renderState(false)
+        } else if(!current?.next){
+            this.nextButton.renderState(false)
+        } else {
+            this.prevButton.renderState(true)
+            this.nextButton.renderState(true)
+        }
+    }
+}
+
+document.querySelector('.controller--right')?.addEventListener('click', debounce(e => {
+    const current = imgSlider.pages.toNext() 
+    imgSlider.track.update({
+        value: current?.element.clientWidth,
+        index: imgSlider.pages.getNodes().indexOf(current)
     })
+
+    imgSlider.checkButtons()
+}, 300, true))
+
+document.querySelector('.controller--left')?.addEventListener('click', debounce(e => {
+    const current = imgSlider.pages.toPrev() 
+    imgSlider.track.update({
+        value: current?.element.clientWidth,
+        index: imgSlider.pages.getNodes().indexOf(current)
+    })
+
+    imgSlider.checkButtons()
+}, 300, true))
+
+const pageSlider = {
+    pages: LinkedList(document.querySelectorAll('.page'))({}),
+    track: TransformerObserver(Transformer({
+        node: document.querySelector('.body__inner'),
+        action: 'translateY'
+        })({})
+    ),
+    nextButton: Controller({
+        node: document.querySelector('.sliderBtn'),
+        activeSel: 'sliderBtn--active'}
+        )({}),
+    pointers: ObserverList(
+        [...document.querySelectorAll('.pointer')]
+        .map((el) => Controller({
+            node: el,
+            activeSel: 'menu__link--active'
+        })({}))
+        .map(PointerObserver)),
+    background: Controller({
+        node: document.querySelector('.background'),
+        activeSel: 'background--main'
+    })({}),
+    checkButton: function() {
+        const current = this.pages.getCurrent()
+        if(!current.next) {
+            this.nextButton.renderState(false)
+        } else {
+            this.nextButton.renderState(true)
+        }
+    },
+    checkBackground: function() {
+        const current = this.pages.getCurrent()
+        if(!current.prev) {
+            this.background.renderState(false)
+        } else {
+            this.background.renderState(true)
+        }
+    }
+}
+
+const linkPublisher = Publisher(pageSlider.pointers)
+const links = [...document.querySelectorAll('.pointer')]
+
+document.querySelector('.sliderBtn')?.addEventListener('click', debounce(e => {
+    const current = pageSlider.pages.toNext()
+    const index = pageSlider.pages.getNodes().indexOf(current)
+
+    pageSlider.track.update({
+        value: current?.element.clientHeight,
+        index: index
+    })
+
+    linkPublisher.notify(links[index])
+    pageSlider.checkButton()
+    pageSlider.checkBackground()
+}, 300, true))
+
+document.querySelector('.header')?.addEventListener('click', debounce(e => {
+    const current = pageSlider.pages.setCurrent(
+        links.indexOf(e.target)
+    )
+    
+    pageSlider.track.update({
+        value: current.element.clientHeight,
+        index: pageSlider.pages.getNodes().indexOf(current)
+    })
+
+    linkPublisher.notify(e.target)
+
+    pageSlider.checkButton()
+    pageSlider.checkBackground()
+}, 300, true))
+
+const answers = ObserverList([...document.querySelectorAll('.question__answer')].map(a => {
+    return PointerObserver(Controller({
+        node: a,
+        activeSel: 'question__answer--active'
+    })({}))
+}))
+
+const qaButtons = ObserverList([...document.querySelectorAll('.question__controller')].map(c => {
+    return PointerObserver(Controller({
+        node: c,
+        activeSel: 'question__controller--active'
+    })({}))
+}))
+
+const answerPublisher = Publisher(answers)
+const qaButtonPublisher = Publisher(qaButtons)
+
+document.querySelector('.qa__wrapper')?.addEventListener('click', e => {
+    qaButtonPublisher.notify(e.target)
+})
+
+function debounce(fn: any, wait: number, immediate?: boolean): any
+
+function debounce(fn, wait, immediate) {
+    let timeout: number |  undefined
+
+    return function deffered(...args: any[]) {
+        const context = this
+        const callNow = immediate && !timeout
+
+        const invoke = () => {
+            timeout = undefined
+            if(!immediate) fn.apply(context, args)
+        }
+
+        clearTimeout(timeout)
+        
+        timeout = setTimeout(invoke, wait)
+
+        if(callNow) fn.apply(context, args)
+    }
+}
+
+window.addEventListener('resize', debounce(() => {
+    const current = pageSlider.pages.getCurrent()
+
+    pageSlider.track.update({
+        value: current.element.clientHeight,
+        index: pageSlider.pages.getNodes().indexOf(current)
+    })
+}, 200))
+
+document.querySelector('.pageContainer')?.addEventListener('scroll', () => {
+    console.log('scrolled')
 })
