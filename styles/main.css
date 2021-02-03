@@ -11,6 +11,10 @@ a {
 .title {
   font-size: 4.4em; }
 
+@media (max-height: 720px) {
+  .title {
+    display: none; } }
+
 .text {
   font-weight: 300;
   font-size: 1.7em;
@@ -76,20 +80,17 @@ button:focus {
   grid-template-columns: 25px 30px 1fr;
   grid-template-rows: 155px 1fr; }
 
+.page--main {
+  grid-row-gap: 53px; }
+
 @media (max-width: 760px) {
   .page {
     padding-bottom: 75px; } }
 
-@media (max-width: 1280px) and (max-height: 720px) {
+@media (max-height: 720px) {
   .page {
-    grid-template-rows: 125px; } }
-
-.page--main {
-  grid-row-gap: 53px; }
-
-@media (max-width: 1280px) and (max-height: 720px) {
-  .page--main {
-    grid-row-gap: 30px; } }
+    grid-template-rows: min-content 1fr;
+    grid-row-gap: 100px; } }
 
 .background {
   position: absolute;
@@ -212,6 +213,8 @@ button:focus {
     flex-flow: column nowrap;
     margin: 140px 25px 0;
     row-gap: 35px; }
+  .menu__link.menu__link--active {
+    transform: translateX(10px); }
   .menu__line {
     height: 1px;
     background-color: rgba(255, 255, 255, 0.25); }
@@ -255,6 +258,8 @@ button:focus {
     transition: all 200ms ease-in-out; }
   .menu__list {
     column-gap: 20px; }
+  .menu__link.menu__link--active {
+    transform: translateY(5px); }
   .menu__tel {
     display: none; }
   .header__container {
@@ -291,7 +296,7 @@ button:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 4;
+  z-index: 1;
   opacity: 0;
   width: 100vw;
   height: 60px;
@@ -586,11 +591,6 @@ button:focus {
   background-image: url("../img/bg/card_bg.png");
   background-size: contain;
   background-repeat: no-repeat; }
-
-@media (max-height: 720px) {
-  .cards__guidelines {
-    left: 22em;
-    height: 25em; } }
 
 @media (max-width: 320px) {
   .page__cards {
