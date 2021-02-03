@@ -109,13 +109,6 @@
     background-repeat: no-repeat;
 }
 
-@media(max-height: get-height($m-screen-s)) {
-    .cards__guidelines {
-        left: 22em;
-        height: 25em;
-    }
-}
-
 @media(max-width: 320px) {
     .page__cards {
         overflow: hidden;

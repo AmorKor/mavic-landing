@@ -3,11 +3,14 @@ const sass = require('gulp-sass')
 const sourcemap = require('gulp-sourcemaps')
 const sync = require('browser-sync').create()
 const pug = require('gulp-pug')
-const ccso = require('gulp-csso')
-const htmlmin = require('gulp-htmlmin')
-const del = require('del')
-const concat = require('gulp-concat')
-const tsc = require('gulp-typescript') 
+// const ccso = require('gulp-csso')
+// const htmlmin = require('gulp-htmlmin')
+// const del = require('del')
+// const concat = require('gulp-concat')
+// const tsc = require('gulp-typescript')
+const tsify = require('tsify') 
+const browserify = require('browserify')
+const vynil = require('vinyl-source-stream')
 
 function compilePug() {
     return src('./src/pug/index.pug')
@@ -25,18 +28,25 @@ function compileSass() {
             .pipe(dest('dist/styles'))
 }
 
-const tscProject = tsc.createProject('./tsconfig.json')
-
 function compileTS() {
-    return src('./src/app/**.ts')
-            .pipe(sourcemap.init())
-            .pipe(tsc({
-                target: 'es2016',
-                removeComments: true,
-                strictNullChecks: false
-            }))
-            .pipe(sourcemap.write('.'))
-            .pipe(dest('./dist/app'))
+    return browserify({
+        basedir: ".",
+        debug: true,
+        entries: [
+            "./src/app/main.ts",
+            "./src/app/linked_list.ts",
+            "./src/app/observer.ts",
+            "./src/app/controller.ts",
+            "./src/app/transformer.ts",
+            "./src/app/utils.ts"
+        ],
+        cache: {},
+        packageCache: {},
+      })
+        .plugin(tsify)
+        .bundle()
+        .pipe(vynil("bundle.js"))
+        .pipe(dest("dist/app"));
 }
 
 function runServer() {
@@ -54,6 +64,7 @@ function stopServer(cb) {
     cb()
 }
 
+exports.tscomp = compileTS
 exports.pug = compilePug
 exports.server = runServer
 exports.serverstop = stopServer

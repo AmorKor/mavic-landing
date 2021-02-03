@@ -59,6 +59,10 @@
         row-gap: 35px;
     }
 
+    .menu__link.menu__link--active {
+        transform: translateX(10px);
+    }
+    
     .menu__line {
         height: 1px;
         background-color: rgba(255, 255, 255, .25);
@@ -128,6 +132,10 @@
         column-gap: 20px;        
     }
 
+    .menu__link.menu__link--active {
+        transform: translateY(5px);
+    }
+    
     .menu__tel {
         display: none;
     }

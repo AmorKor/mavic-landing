@@ -33,28 +33,23 @@
     grid-template-rows: 155px 1fr;
 }
 
+.page--main {
+    grid-row-gap: 53px;
+}
+
 @media (max-width: 760px) {
     .page {
         padding-bottom: 75px;
     }
 }
 
-
-@media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
+@media(max-height: 720px) {
     .page {
-        grid-template-rows: 125px;
+        grid-template-rows: min-content 1fr;
+        grid-row-gap: 100px;
     }
 }
 
-.page--main {
-    grid-row-gap: 53px;
-}
-
-@media(max-width: get-width($m-screen-s)) and (max-height: get-height($m-screen-s)) {
-    .page--main {
-        grid-row-gap: 30px;
-    }
-}
 
 // BACKGROUND
 .background {
