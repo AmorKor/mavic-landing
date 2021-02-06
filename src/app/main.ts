@@ -1,19 +1,16 @@
-import {isMobile, debounce} from './utils'
-import {LinkedList} from './linked_list'
+import {isMobile, debounce, transform, isActive} from './utils'
+import {NodeF, LinkedList} from './linked_list'
 import {Controller} from './controller'
-import {Transformer} from './transformer'
-import {Publisher, ObserverList, LinkObserver, TransformerObserver} from './observer'
+import { ControllerObserver, ObserverList, Publisher } from './observer'
 
 // menu on mobile version setup
 const menu = {
-    button: Controller({
-        node: document.querySelector('.burger'),
-        activeSel: 'burger--active'
-    }),
-    nav: Controller({
-        node: document.querySelector('.menu'),
-        activeSel: 'menu--active'
-    }) 
+    button: Controller(
+        document.querySelector('.burger')
+        )('burger--active'),
+    nav: Controller(
+        document.querySelector('.menu')
+        )('menu--active')
 }
 
 document.querySelector('.burger')?.addEventListener('click', () => {
@@ -28,26 +25,25 @@ document.querySelector('.burger')?.addEventListener('click', () => {
 
 // description slider setup
 export const imgSlider = {
-    pages: LinkedList(document.querySelectorAll('.slider__img')),
-    
-    track: TransformerObserver(Transformer({
-        node: document.querySelector('.slider__inner'),
-        action: 'translateX'
-        })
-    ),
-    
-    nextButton: Controller({
-        node: document.querySelector('.controller--right'),
-        activeSel: 'controller--active'}
+    pages: LinkedList(
+            [...document.querySelectorAll('.slider__img')]
+            .map(NodeF)
         ),
+    
+    track: Controller(
+        document.querySelector('.slider__inner')
+        )(''),
+    
+    nextButton: Controller(
+        document.querySelector('.controller--right')
+        )('controller--active'),
         
-    prevButton: Controller({
-        node: document.querySelector('.controller--left'),
-        activeSel: 'controller--active'}
-        ),
+    prevButton: Controller(
+            document.querySelector('.controller--left')
+            )('controller--active'),
         
     checkButtons: function() {
-        const current = this.pages.getCurrent()
+        const current = this.pages.current
 
         if(!current?.prev) {
             this.prevButton.renderState(false)
@@ -60,86 +56,93 @@ export const imgSlider = {
     }
 }
 
+const transformImgSlider = transform('translateX')
+
 document.querySelector('.controller--right')?.addEventListener('click', debounce(() => {
     const current = imgSlider.pages.toNext() 
-    imgSlider.track.update({
-        value: current?.element.clientWidth,
-        index: imgSlider.pages.indexOf(current)
-    })
 
+    if(!current) return
+    
+    imgSlider.track.map(transformImgSlider(
+        `-${
+            current?.element.clientWidth * imgSlider.pages.indexOf(current)
+        }px`
+    ))
+    
     imgSlider.checkButtons()
 }, 300, true))
 
 document.querySelector('.controller--left')?.addEventListener('click', debounce(() => {
     const current = imgSlider.pages.toPrev() 
-    imgSlider.track.update({
-        value: current?.element.clientWidth,
-        index: imgSlider.pages.indexOf(current)
-    })
+
+    if(!current) return
+    
+    imgSlider.track.map(transformImgSlider(
+        `-${
+            current?.element.clientWidth * imgSlider.pages.indexOf(current)
+        }px`
+    ))
 
     imgSlider.checkButtons()
 }, 300, true))
 
 // page slider setup
 const pageSlider = {
-    pages: LinkedList(document.querySelectorAll('.page')),
-
-    track: TransformerObserver(Transformer({
-        node: document.querySelector('.body__inner'),
-        action: 'translateY'
-        })
-    ),
-
-    nextButton: Controller({
-        node: document.querySelector('.sliderBtn'),
-        activeSel: 'sliderBtn--active'}
+    pages: LinkedList(
+            [...document.querySelectorAll('.page')]
+            .map(NodeF)
         ),
 
-    links: [...document.querySelectorAll<HTMLElement>('.pointer')]
-        .map((el) => Controller({
-            node: el,
-            activeSel: 'menu__link--active'
-        })),
+    track: Controller(
+        document.querySelector('.body__inner')
+        )(''),
 
-    background: Controller({
-        node: document.querySelector('.background'),
-        activeSel: 'background--main'
-    }),
+    nextButton: Controller(
+            document.querySelector('.sliderBtn')
+            )('sliderBtn--active'),
+
+    links: [...document.querySelectorAll('.pointer')]
+        .map(Controller)
+        .map(el => el('menu__link--active')),
+
+    background: Controller(
+            document.querySelector('.background')
+            )('background--main'),
 
     checkButton: function() {
-        const current = this.pages.getCurrent()
-        if(!current.next) {
-            this.nextButton.renderState(false)
-        } else {
+        !this.pages.current.next ? 
+            this.nextButton.renderState(false) :
             this.nextButton.renderState(true)
-        }
     },
 
     checkBackground: function() {
-        const current = this.pages.getCurrent()
-        if(!current.prev) {
-            this.background.renderState(false)
-        } else {
+        !this.pages.current.prev ?
+            this.background.renderState(false) :
             this.background.renderState(true)
-        }
     }
 }
 
+
+const transformPageSlider = transform('translateY')
+
 // for syncronizing header menu with page slider
-const linkObservers = ObserverList(
-    pageSlider.links
-    .map(l => LinkObserver(l))
+const linkPublisher = Publisher(
+    ObserverList(
+        pageSlider.links.map(ControllerObserver)
+    )
 )
-const linkPublisher = Publisher(linkObservers)
 
 document.querySelector('.sliderBtn')?.addEventListener('click', debounce(() => {
     const current = pageSlider.pages.toNext()
-    const index = pageSlider.pages.indexOf(current) || -1
+    if(!current) return
 
-    pageSlider.track.update({
-        value: current?.element.clientHeight,
-        index: index
-    })
+    const index = pageSlider.pages.indexOf(current)
+
+    pageSlider.track.map(transformPageSlider(
+        `-${
+            current?.element.clientHeight * index
+        }px`
+    ))
 
     linkPublisher.notify(pageSlider.links[index].getElement())
 
@@ -151,13 +154,17 @@ document.querySelector('.header')?.addEventListener('click', debounce((e: Event)
     const controller = pageSlider.links.find((contr) => contr.getElement() === e.target)
 
     if(!controller) return
+
     const index = pageSlider.links.indexOf(controller)
     const current = pageSlider.pages.setCurrent(index)
     
-    pageSlider.track.update({
-        value: current?.element.clientHeight,
-        index: pageSlider.pages.indexOf(current)
-    })
+    if(!current) return
+    
+    pageSlider.track.map(transformPageSlider(
+        `-${
+            current?.element.clientHeight * index
+        }px`
+    ))
 
     if(isMobile(1150)) {
         menu.nav.renderState(false)
@@ -170,39 +177,36 @@ document.querySelector('.header')?.addEventListener('click', debounce((e: Event)
     pageSlider.checkBackground()
 }, 300, true))
 
-const answers = ObserverList([...document.querySelectorAll<HTMLElement>('.question__answer')].map(a => {
-    return LinkObserver(Controller({
-        node: a,
-        activeSel: 'question__answer--active'
-    }))
-}))
+// fix transformation on window resize
+window.addEventListener('resize', debounce(() => {
+    const current = pageSlider.pages.current
+    pageSlider.track.map(transformPageSlider(
+        `-${
+            current.element.clientHeight * pageSlider.pages.indexOf(current)
+        }px`
+    ))
+}, 200))
 
-const qaButtons = ObserverList([...document.querySelectorAll<HTMLElement>('.question__controller')].map(c => {
-    return LinkObserver(Controller({
-        node: c,
-        activeSel: 'question__controller--active'
-    }))
-}))
-
-const answerPublisher = Publisher(answers)
-const qaButtonPublisher = Publisher(qaButtons)
+const questionPublisher = Publisher(
+    ObserverList(
+        [...document.querySelectorAll('.question')]
+            .map(Controller)
+            .map(contr => contr('question--active'))
+            .map(ControllerObserver)
+    )
+) 
 
 document.querySelector('.qa__wrapper')?.addEventListener('click', (e: any) => {
-    console.log(e)
     if(isMobile(770)) {
-        answerPublisher.notify(e.target.children[0])
-        qaButtonPublisher.notify(e.target.children[1])
+        isActive(e.target)('question--active') ?
+            questionPublisher.notify({}) :
+            questionPublisher.notify(e.target)
         return
     }
-    qaButtonPublisher.notify(e.target)
-    answerPublisher.notify(e.target.previousElementSibling)
+
+    isActive(e.target.parentElement)('question--active') ?
+        questionPublisher.notify({}) :
+        questionPublisher.notify(e.target.parentElement)
+
 })
 
-window.addEventListener('resize', debounce(() => {
-    const current = pageSlider.pages.getCurrent()
-
-    pageSlider.track.update({
-        value: current.element.clientHeight,
-        index: pageSlider.pages.indexOf(current)
-    })
-}, 200))

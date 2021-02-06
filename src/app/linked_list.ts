@@ -1,52 +1,72 @@
-interface INode {
-    element: any
-    next: INode | null
-    prev: INode | null
+import { compose, withConstructor } from './utils'
+
+interface INode<T> 
+{
+    element: T
+    next: INode<T> | undefined
+    prev: INode<T> | undefined
 }
 
-interface ILinkedList {
-    getHead(): INode
-    getTail(): INode
-    getCurrent(): INode
-    indexOf(node: INode | null): number | null
+interface ILinkedList<T> 
+{
+    head: INode<T>
+    tail: INode<T>
+    current: INode<T>
+        
+    indexOf(node: INode<T>): number
     
-    setCurrent(index: number): INode | null
-    toNext(): INode | null
-    toPrev(): INode | null
+    setCurrent(index: number): INode<T> | undefined
+    toNext(): INode<T> | undefined
+    toPrev(): INode<T> | undefined
 }
 
-export function NodeF(element: Element): INode {
-    return {
+export function NodeF<T>(element: T): INode<T> 
+{
+    return compose<INode<T>>(
+        withConstructor(NodeF)
+    )({
         element,
-        next: null,
-        prev: null    
-    }
+        next: undefined,
+        prev: undefined    
+    })
 }
 
-export function linkNodes(nodes: INode[]): INode[] {
-    return nodes.map((node, i, arr) => (
-            Object.assign(node, {
-                next: arr[i + 1],
-                prev: arr[i - 1]
-            })
+export function LinkedList<T>(nodes: INode<T>[]): ILinkedList<T> 
+{
+    const collection: INode<T>[] = nodes
+        .map((node, i, arr) => (
+            Object.assign(
+            node, 
+            {
+            next: arr[i + 1],
+            prev: arr[i - 1]
+            }
         ))
-}
-
-export function LinkedList(nodes: NodeListOf<Element>): ILinkedList {
-    const collection = linkNodes([...nodes].map(NodeF))
-    let head = collection[0]
-    let tail = collection[collection.length - 1]
-    let current = collection[0]
+    )
     
-    return {
-        getHead: () => head,
-        getTail: () => tail,
-        getCurrent: () => current,
-        indexOf: (node) => node ? collection.indexOf(node) : null,
-        // getByIndex()
+    return compose<ILinkedList<T>>(
+        withConstructor(LinkedList)
+    )({
+        head: collection[0],
+        tail: collection[collection.length - 1],
+        current: collection[0],
+
+        indexOf: (node) =>  collection.indexOf(node),
                 
-        setCurrent: (index) => collection[index] ? current = collection[index]: tail.next,
-        toNext: () => current.next ? current = current.next : current.next,
-        toPrev: () => current.prev ? current = current.prev : current.prev
-    }
+        setCurrent(index) {
+            return collection[index] ?
+                    this.current = collection[index] : 
+                    undefined
+        },
+        toNext()  {
+            return this.current.next ?
+                    this.current = this.current.next :
+                    undefined
+        },
+        toPrev()  {
+            return this.current.prev ?
+                    this.current = this.current.prev :
+                    undefined
+        }
+    })
 }

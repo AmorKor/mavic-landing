@@ -39,7 +39,7 @@
     transition: all 400ms ease-in-out;
 }
     
-.question__answer--active {
+.question--active > .question__answer {
     margin-top: 1.3em;
     height: 5em;
 }
@@ -61,7 +61,7 @@
     transition: background-image 300ms ease-in-out;
 }
 
-.question__controller--active {
+.question--active > .question__controller {
     background-image: url('../img/icons/dropdown-arrow-active.png')
 }
 
@@ -98,7 +98,7 @@
         padding: .75em 1em;
     }
 
-    .question__answer--active {
+    .question--active > .question__answer {
         height: 10em;
     }    
 }
@@ -114,7 +114,7 @@
 }
 
 @media(min-width: 491px) and (max-width: 771px) {
-    .question__answer--active {
+    .question--active > .question__answer {
         height: 8em;
     }    
     

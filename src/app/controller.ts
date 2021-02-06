@@ -1,27 +1,33 @@
+import { compose, withConstructor } from "./utils"
+
 export interface IController {
-    getElement(): HTMLElement | null
+    map(fn: CallableFunction): IController
+    getElement(): HTMLElement | Element | null
     getState(): boolean
-    renderState(isActive: boolean): void
+    renderState(isActive: boolean): HTMLElement | Element | null
 }
 
-export function Controller(
-    arg: 
-    {node: HTMLElement | null, activeSel: string}
-): IController 
+export const Controller = (node: HTMLElement | Element | null) => (activeSel: string): IController =>
 {
-    let isEnabled = arg.node?.classList.contains(arg.activeSel) ? true : false
-    return {
-    
-        getElement: () => arg.node,
+    let isEnabled = node?.classList.contains(activeSel) ? true : false
+
+    return compose<IController>(
+        withConstructor(Controller)
+    )({
+        map: fn => Controller(fn(node))(activeSel),
+        
+        getElement: () => node,
+        
         getState: () => isEnabled,
         
         renderState: (isActive) => {            
-            if(isActive) {
-                arg.node?.classList.add(arg.activeSel)
-            } else {
-                arg.node?.classList.remove(arg.activeSel)
-            }
             isEnabled = isActive
+            if(isEnabled) {
+                node?.classList.add(activeSel)
+            } else {
+                node?.classList.remove(activeSel)
+            }
+            return node
         },
-    }
+    })
 }

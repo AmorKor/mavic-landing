@@ -3,14 +3,13 @@ const sass = require('gulp-sass')
 const sourcemap = require('gulp-sourcemaps')
 const sync = require('browser-sync').create()
 const pug = require('gulp-pug')
-// const ccso = require('gulp-csso')
-// const htmlmin = require('gulp-htmlmin')
-// const del = require('del')
-// const concat = require('gulp-concat')
-// const tsc = require('gulp-typescript')
+const buffer = require('vinyl-buffer')
+const terser = require('gulp-terser')
 const tsify = require('tsify') 
 const browserify = require('browserify')
 const vynil = require('vinyl-source-stream')
+const htmlmin = require('gulp-htmlmin')
+const csso = require('gulp-csso')
 
 function compilePug() {
     return src('./src/pug/index.pug')
@@ -37,7 +36,6 @@ function compileTS() {
             "./src/app/linked_list.ts",
             "./src/app/observer.ts",
             "./src/app/controller.ts",
-            "./src/app/transformer.ts",
             "./src/app/utils.ts"
         ],
         cache: {},
@@ -46,7 +44,23 @@ function compileTS() {
         .plugin(tsify)
         .bundle()
         .pipe(vynil("bundle.js"))
+        .pipe(buffer())
+        .pipe(terser())
         .pipe(dest("dist/app"));
+}
+
+function minHTML() {
+    return src('./dist/index.html')
+            .pipe(htmlmin({collapseWhitespace: true}))
+            .pipe(dest('./dist'))
+}
+
+function minCSS() {
+    return src('./dist/styles/main.css')
+            .pipe(csso({
+                restructure: false
+            }))
+            .pipe(dest('./dist/styles'))
 }
 
 function runServer() {
@@ -59,12 +73,6 @@ function runServer() {
     watch('./src/app/**.ts', series(compileTS)).on('change', sync.reload)
 }
 
-function stopServer(cb) {
-    sync.exit()
-    cb()
-}
-
+exports.final = series(parallel(compileTS, compilePug, compileSass), parallel(minCSS, minHTML))
 exports.tscomp = compileTS
-exports.pug = compilePug
 exports.server = runServer
-exports.serverstop = stopServer

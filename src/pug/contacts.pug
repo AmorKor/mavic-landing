@@ -23,7 +23,12 @@ h1.title.page__title.page__title--contacts Контакты
                 textarea.form__textarea(name="textarea", cols="30", rows="10" wrap='hard' placeholder='Что вас интересует?' required)
             button.button.form__button Отправить
     ul.socials.content__socials.socials--vertical
-        for img in ['fb', 'yt', 'ins']
-            li.socials__item
-                a.socials__link(href='#')
-                    img(src=`img/icons/${img}.png`, alt=`${img}`)
+        li.socials__item
+            a.socials__link(href='https://www.facebook.com/' target="_blank")
+                img(src=`img/icons/fb.png`, alt=`fb`)
+        li.socials__item
+            a.socials__link(href='https://www.youtube.com/' target="_blank")
+                img(src=`img/icons/yt.png`, alt=`yt`)
+        li.socials__item
+            a.socials__link(href='https://www.instagram.com/' target="_blank")
+                img(src=`img/icons/ins.png`, alt=`ins`)
