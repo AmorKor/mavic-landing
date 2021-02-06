@@ -71,12 +71,12 @@
     .burger {
         width: 25px;
         height: 25px;
-        background: no-repeat center url('../../img/icons/burger.svg');
+        background: no-repeat center url('../img/icons/burger.svg');
         transition: all 200ms ease-in;
     }
     
     .burger--active {
-        background: no-repeat center url('../../img/icons/burger_active.svg');
+        background: no-repeat center url('../img/icons/burger_active.svg');
         
     }
 

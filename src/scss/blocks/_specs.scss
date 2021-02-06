@@ -43,11 +43,6 @@
 
 
 @media(max-width: 360px) {
-    .page__title--specs {
-        display: none;
-    }
-
-    
     .specs__wrapper {
         align-self: flex-end;
         
@@ -59,6 +54,17 @@
         grid-column: 2 / 4;
         
         height: 100%;
+    }
+}
+
+@media(max-width: 495px) {
+    .page__specs {
+        grid-row: 1 / 4;
+        margin-top: 7vh;
+    }
+    
+    .page__title--specs {
+        display: none;
     }
 }
 

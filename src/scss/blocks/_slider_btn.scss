@@ -19,12 +19,6 @@
     transition: all 300ms ease;
 }
 
-@media (max-width: 760px) {
-    .sliderBtn {
-        height: 45px;
-    }
-}
-
 .sliderBtn--active {
     opacity: 1;
 }
