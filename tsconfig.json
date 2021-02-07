@@ -73,7 +73,6 @@
     "./src/app/linked_list.ts",
     "./src/app/observer.ts",
     "./src/app/controller.ts",
-    "./src/app/transformer.ts",
     "./src/app/utils.ts"
   ]
 }

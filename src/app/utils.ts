@@ -50,4 +50,3 @@ export const transform = (action: string) => (value: string) => (node: HTMLEleme
     return node
 }
 
-

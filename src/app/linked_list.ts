@@ -1,13 +1,13 @@
 import { compose, withConstructor } from './utils'
 
-interface INode<T> 
+export interface INode<T> 
 {
     element: T
     next: INode<T> | undefined
     prev: INode<T> | undefined
 }
 
-interface ILinkedList<T> 
+export interface ILinkedList<T> 
 {
     head: INode<T>
     tail: INode<T>
@@ -20,31 +20,49 @@ interface ILinkedList<T>
     toPrev(): INode<T> | undefined
 }
 
-export function NodeF<T>(element: T): INode<T> 
+export interface IPage 
 {
-    return compose<INode<T>>(
-        withConstructor(NodeF)
-    )({
-        element,
-        next: undefined,
-        prev: undefined    
-    })
+    page: Element
+    number: number
 }
 
-export function LinkedList<T>(nodes: INode<T>[]): ILinkedList<T> 
-{
-    const collection: INode<T>[] = nodes
-        .map((node, i, arr) => (
-            Object.assign(
-            node, 
-            {
-            next: arr[i + 1],
-            prev: arr[i - 1]
-            }
-        ))
-    )
+export const NodeF = <T>(element: T): INode<T> => 
+compose<INode<T>>(
+    withConstructor(NodeF)
+)({
+    element,
+    next: undefined,
+    prev: undefined
+})
     
-    return compose<ILinkedList<T>>(
+export const linkNodes = <T>(nodes: INode<T>[]): INode<T>[] =>
+(
+    nodes.map((node, i, arr) => (
+        Object.assign(
+                node, 
+                {
+                next: arr[i + 1],
+                prev: arr[i - 1]
+                }
+            )
+        )
+    )
+)
+
+export const Page = (node: Element): IPage =>
+({
+    page: node,
+    number: 0
+})
+
+export const paginate = (page: IPage) => (number: number) =>
+({
+    ...page,
+    number
+})
+
+export const LinkedList = <T>(collection: INode<T>[]): ILinkedList<T> => 
+    compose<ILinkedList<T>>(
         withConstructor(LinkedList)
     )({
         head: collection[0],
@@ -69,4 +87,3 @@ export function LinkedList<T>(nodes: INode<T>[]): ILinkedList<T>
                     undefined
         }
     })
-}

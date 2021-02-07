@@ -1,7 +1,24 @@
 import {isMobile, debounce, transform, isActive} from './utils'
-import {NodeF, LinkedList} from './linked_list'
+import {NodeF, LinkedList, Page, paginate, linkNodes, INode, IPage} from './linked_list'
 import {Controller} from './controller'
 import { ControllerObserver, ObserverList, Publisher } from './observer'
+
+const showPage = (slider: typeof imgSlider | typeof pageSlider, transformer: CallableFunction) =>
+(action: 'toNext' | 'toPrev', isVertical: boolean = false): INode<IPage> | undefined => {
+    const node = slider.pages[action]()
+
+    if(!node) return
+    
+    slider.track.map(transformer(
+        `-${
+            isVertical ?
+            node.element.page.clientHeight * node.element.number :
+            node.element.page.clientWidth * node.element.number 
+        }px`
+    ))
+
+    return node
+}
 
 // menu on mobile version setup
 const menu = {
@@ -26,8 +43,12 @@ document.querySelector('.burger')?.addEventListener('click', () => {
 // description slider setup
 export const imgSlider = {
     pages: LinkedList(
-            [...document.querySelectorAll('.slider__img')]
-            .map(NodeF)
+            linkNodes(
+                [...document.querySelectorAll('.slider__img')]
+                .map(Page)
+                .map((page, i) => paginate(page)(i))
+                .map(NodeF)
+            )
         ),
     
     track: Controller(
@@ -57,40 +78,27 @@ export const imgSlider = {
 }
 
 const transformImgSlider = transform('translateX')
+const moveImgSlider = showPage(imgSlider, transformImgSlider)
 
 document.querySelector('.controller--right')?.addEventListener('click', debounce(() => {
-    const current = imgSlider.pages.toNext() 
-
-    if(!current) return
-    
-    imgSlider.track.map(transformImgSlider(
-        `-${
-            current?.element.clientWidth * imgSlider.pages.indexOf(current)
-        }px`
-    ))
-    
+    moveImgSlider('toNext')    
     imgSlider.checkButtons()
 }, 300, true))
 
 document.querySelector('.controller--left')?.addEventListener('click', debounce(() => {
-    const current = imgSlider.pages.toPrev() 
-
-    if(!current) return
-    
-    imgSlider.track.map(transformImgSlider(
-        `-${
-            current?.element.clientWidth * imgSlider.pages.indexOf(current)
-        }px`
-    ))
-
+    moveImgSlider('toNext')
     imgSlider.checkButtons()
 }, 300, true))
 
 // page slider setup
 const pageSlider = {
     pages: LinkedList(
-            [...document.querySelectorAll('.page')]
-            .map(NodeF)
+            linkNodes(
+                [...document.querySelectorAll('.page')]
+                .map(Page)
+                .map((page, i) => paginate(page)(i))
+                .map(NodeF)
+            )
         ),
 
     track: Controller(
@@ -122,8 +130,8 @@ const pageSlider = {
     }
 }
 
-
 const transformPageSlider = transform('translateY')
+const movePageSlider = showPage(pageSlider, transformPageSlider)
 
 // for syncronizing header menu with page slider
 const linkPublisher = Publisher(
@@ -133,24 +141,17 @@ const linkPublisher = Publisher(
 )
 
 document.querySelector('.sliderBtn')?.addEventListener('click', debounce(() => {
-    const current = pageSlider.pages.toNext()
+    const current = movePageSlider('toNext', true)
+
     if(!current) return
 
-    const index = pageSlider.pages.indexOf(current)
-
-    pageSlider.track.map(transformPageSlider(
-        `-${
-            current?.element.clientHeight * index
-        }px`
-    ))
-
-    linkPublisher.notify(pageSlider.links[index].getElement())
+    linkPublisher.notify(pageSlider.links[current.element.number].getElement())
 
     pageSlider.checkButton()
     pageSlider.checkBackground()
 }, 300, true))
 
-document.querySelector('.header')?.addEventListener('click', debounce((e: Event) => {    
+document.querySelector('.header')?.addEventListener('click', debounce((e: MouseEvent) => {    
     const controller = pageSlider.links.find((contr) => contr.getElement() === e.target)
 
     if(!controller) return
@@ -162,7 +163,7 @@ document.querySelector('.header')?.addEventListener('click', debounce((e: Event)
     
     pageSlider.track.map(transformPageSlider(
         `-${
-            current?.element.clientHeight * index
+            current?.element.page.clientHeight * index
         }px`
     ))
 
@@ -177,12 +178,28 @@ document.querySelector('.header')?.addEventListener('click', debounce((e: Event)
     pageSlider.checkBackground()
 }, 300, true))
 
+// document.querySelector('.body')
+document.querySelectorAll('.page').forEach(page => {
+    page.addEventListener('wheel', debounce((e: WheelEvent) => {
+        const current = e.deltaY < 0 ?
+        movePageSlider('toPrev', true) :
+        movePageSlider('toNext', true)
+        
+        if(!current) return
+
+        linkPublisher.notify(pageSlider.links[current.element.number].getElement())
+    
+        pageSlider.checkButton()
+        pageSlider.checkBackground()
+    }, 300, true))
+})
+
 // fix transformation on window resize
 window.addEventListener('resize', debounce(() => {
     const current = pageSlider.pages.current
     pageSlider.track.map(transformPageSlider(
         `-${
-            current.element.clientHeight * pageSlider.pages.indexOf(current)
+            current?.element.page.clientHeight * current?.element.number
         }px`
     ))
 }, 200))
@@ -209,4 +226,3 @@ document.querySelector('.qa__wrapper')?.addEventListener('click', (e: any) => {
         questionPublisher.notify(e.target.parentElement)
 
 })
-
