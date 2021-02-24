@@ -86,7 +86,7 @@ document.querySelector('.controller--right')?.addEventListener('click', debounce
 }, 300, true))
 
 document.querySelector('.controller--left')?.addEventListener('click', debounce(() => {
-    moveImgSlider('toNext')
+    moveImgSlider('toPrev')
     imgSlider.checkButtons()
 }, 300, true))
 

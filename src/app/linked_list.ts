@@ -1,14 +1,12 @@
 import { compose, withConstructor } from './utils'
 
-export interface INode<T> 
-{
+export interface INode<T> {
     element: T
     next: INode<T> | undefined
     prev: INode<T> | undefined
 }
 
-export interface ILinkedList<T> 
-{
+export interface ILinkedList<T> {
     head: INode<T>
     tail: INode<T>
     current: INode<T>
@@ -20,8 +18,7 @@ export interface ILinkedList<T>
     toPrev(): INode<T> | undefined
 }
 
-export interface IPage 
-{
+export interface IPage {
     page: Element
     number: number
 }
@@ -35,8 +32,7 @@ compose<INode<T>>(
     prev: undefined
 })
     
-export const linkNodes = <T>(nodes: INode<T>[]): INode<T>[] =>
-(
+export const linkNodes = <T>(nodes: INode<T>[]): INode<T>[] => (
     nodes.map((node, i, arr) => (
         Object.assign(
                 node, 
@@ -49,14 +45,12 @@ export const linkNodes = <T>(nodes: INode<T>[]): INode<T>[] =>
     )
 )
 
-export const Page = (node: Element): IPage =>
-({
+export const Page = (node: Element): IPage => ({
     page: node,
     number: 0
 })
 
-export const paginate = (page: IPage) => (number: number) =>
-({
+export const paginate = (page: IPage) => (number: number) => ({
     ...page,
     number
 })

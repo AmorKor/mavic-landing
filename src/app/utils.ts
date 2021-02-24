@@ -1,11 +1,9 @@
-export function compose<T>(...fns: CallableFunction[]) 
-{
+export function compose<T>(...fns: CallableFunction[]) {
     return (arg: T): T => 
     fns.reduceRight((x, fn) => fn(x), arg)
 }  
 
-export function pipe<T>(...fns: CallableFunction[])
-{
+export function pipe<T>(...fns: CallableFunction[]) {
     return (arg: T): T => 
         fns.reduce((x, fn) => fn(x), arg)
 }
