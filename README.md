@@ -1,5 +1,5 @@
 # Mavic Drone
-Adaptive landing page
+Adaptive landing page.
 Live example [here](https://amorkor.github.io/mavic-landing/)
 ### Project features
 Main prerequisites for building up this project were desire to get in touch with functional programming and try to combine OOP approaches with functional concepts in most effective way.
